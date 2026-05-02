@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { loginUser } from "../../services/api";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -26,27 +27,13 @@ function Login() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
+      const data = await loginUser(formData);
 
       console.log("Login success:", data);
 
-      // Example: save token if exists
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
-
     } catch (error) {
       console.error("Error:", error);
       setError(error.message || "Something went wrong");
