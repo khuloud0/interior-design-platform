@@ -8,6 +8,7 @@ function Login() {
   });
 
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -25,6 +26,7 @@ function Login() {
     }
 
     setError("");
+    setIsLoading(true);
 
     try {
       const data = await loginUser(formData);
@@ -37,6 +39,8 @@ function Login() {
     } catch (error) {
       console.error("Error:", error);
       setError(error.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -52,6 +56,7 @@ function Login() {
             placeholder="Enter your email"
             value={formData.email}
             onChange={handleChange}
+            disabled={isLoading}
           />
         </div>
 
@@ -64,6 +69,7 @@ function Login() {
             placeholder="Enter your password"
             value={formData.password}
             onChange={handleChange}
+            disabled={isLoading}
           />
         </div>
 
@@ -71,7 +77,9 @@ function Login() {
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Logging in..." : "Login"}
+        </button>
       </form>
     </div>
   );
