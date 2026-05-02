@@ -1,37 +1,48 @@
 const API_BASE_URL = "http://localhost:5000/api";
 
+// Generic request handler
+async function request(endpoint, options) {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      ...options,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Something went wrong");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("API Error:", error.message);
+    throw error;
+  }
+}
+
+// Login
 export async function loginUser(userData) {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  return request("/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(userData),
   });
-
-  return response.json();
 }
 
+// Signup
 export async function signupUser(userData) {
-  const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+  return request("/auth/signup", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(userData),
   });
-
-  return response.json();
 }
 
+// Submit Design Request
 export async function submitDesignRequest(requestData) {
-  const response = await fetch(`${API_BASE_URL}/design-requests`, {
+  return request("/design-requests", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(requestData),
   });
-
-  return response.json();
 }
