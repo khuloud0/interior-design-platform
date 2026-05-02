@@ -100,11 +100,14 @@ def login_user(data):
 
 
 def verify_email(data):
-    required_fields = ["email"]
+    required_fields = ["email", "verified"]
 
     is_valid, error = validate_required_fields(data, required_fields)
     if not is_valid:
         return {"error": error}, 400
+
+    if data["verified"] is not True:
+        return {"error": "Email verification failed"}, 400
 
     user = User.query.filter_by(email=data["email"]).first()
     if not user:
@@ -117,11 +120,14 @@ def verify_email(data):
 
 
 def verify_phone(data):
-    required_fields = ["phone"]
+    required_fields = ["phone", "verified"]
 
     is_valid, error = validate_required_fields(data, required_fields)
     if not is_valid:
         return {"error": error}, 400
+
+    if data["verified"] is not True:
+        return {"error": "Phone verification failed"}, 400
 
     user = User.query.filter_by(phone=data["phone"]).first()
     if not user:
