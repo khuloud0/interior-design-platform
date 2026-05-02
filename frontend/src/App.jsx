@@ -1,5 +1,11 @@
+import PhoneOtpVerification from "./pages/PhoneOtpVerification";
+
 function App() {
-  return <h1>Hello</h1>;
+  return (
+    <div>
+      <PhoneOtpVerification />
+    </div>
+  );
 }
 
 export default App;
