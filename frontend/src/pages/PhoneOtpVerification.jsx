@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { verifyPhone } from "../services/api";
 
 export default function PhoneOtpVerification() {
   const [phone, setPhone] = useState("");
@@ -41,27 +42,11 @@ export default function PhoneOtpVerification() {
         return;
       }
 
-      const response = await fetch("http://127.0.0.1:8000/auth/verify-phone", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone,
-          verified: true,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setMessage(data.message || "Phone verification failed");
-        return;
-      }
+      const data = await verifyPhone(phone);
 
       setMessage(data.message || "Phone verified successfully");
     } catch (error) {
-      setMessage("Unable to verify phone right now");
+      setMessage(error.message || "Unable to verify phone right now");
     } finally {
       setIsLoading(false);
     }
@@ -77,9 +62,10 @@ export default function PhoneOtpVerification() {
           placeholder="Enter phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          disabled={isLoading}
         />
 
-        <button type="button" onClick={handleSendOtp}>
+        <button type="button" onClick={handleSendOtp} disabled={isLoading}>
           Send OTP
         </button>
       </div>
@@ -91,6 +77,7 @@ export default function PhoneOtpVerification() {
           value={otp}
           maxLength={6}
           onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+          disabled={isLoading}
         />
 
         <button type="submit" disabled={isLoading}>
