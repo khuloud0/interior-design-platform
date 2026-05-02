@@ -6,6 +6,8 @@ function Login() {
     password: "",
   });
 
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -15,33 +17,54 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData); // مؤقتًا
+
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setError("All fields are required");
+      return;
+    }
+
+    setError("");
+
+    console.log("Login Data:", formData);
+
+    // TODO: integrate with backend authentication API
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="login-container">
       <h2>Login</h2>
 
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        onChange={handleChange}
-      />
+      <form onSubmit={handleSubmit}>
+        <div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
 
-      <br /><br />
+        <br />
 
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        onChange={handleChange}
-      />
+        <div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
 
-      <br /><br />
+        <br />
 
-      <button type="submit">Login</button>
-    </form>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
 }
 
