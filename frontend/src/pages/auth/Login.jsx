@@ -15,10 +15,9 @@ function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!formData.email || !formData.password) {
       setError("All fields are required");
       return;
@@ -26,9 +25,32 @@ function Login() {
 
     setError("");
 
-    console.log("Login Data:", formData);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    // TODO: integrate with backend authentication API
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      console.log("Login success:", data);
+
+      // Example: save token if exists
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+    } catch (error) {
+      console.error("Error:", error);
+      setError(error.message || "Something went wrong");
+    }
   };
 
   return (
