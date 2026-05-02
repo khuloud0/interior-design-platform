@@ -17,7 +17,7 @@ function DesignForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData); // مؤقتًا نطبع البيانات
+    console.log(formData); // 
   };
 
   return (
