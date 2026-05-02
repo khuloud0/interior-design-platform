@@ -1,7 +1,6 @@
 const API_BASE_URL = "http://localhost:5000/api";
 
-// Generic request handler
-async function request(endpoint, options) {
+async function request(endpoint, options = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
@@ -23,26 +22,44 @@ async function request(endpoint, options) {
   }
 }
 
-// Login
-export async function loginUser(userData) {
+export function loginUser(userData) {
   return request("/auth/login", {
     method: "POST",
     body: JSON.stringify(userData),
   });
 }
 
-// Signup
-export async function signupUser(userData) {
+export function signupUser(userData) {
   return request("/auth/signup", {
     method: "POST",
     body: JSON.stringify(userData),
   });
 }
 
-// Submit Design Request
-export async function submitDesignRequest(requestData) {
+export function submitDesignRequest(requestData) {
   return request("/design-requests", {
     method: "POST",
     body: JSON.stringify(requestData),
+  });
+}
+
+export function verifyPhone(phone) {
+  return fetch("http://127.0.0.1:8000/auth/verify-phone", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      phone,
+      verified: true,
+    }),
+  }).then(async (response) => {
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Phone verification failed");
+    }
+
+    return data;
   });
 }
