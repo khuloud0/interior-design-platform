@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { signupUser } from "../../services/api";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -7,6 +8,10 @@ function Signup() {
     password: "",
   });
 
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -14,18 +19,29 @@ function Signup() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Example validation
     if (!formData.name || !formData.email || !formData.password) {
-      alert("All fields are required");
+      setError("All fields are required");
       return;
     }
 
-    console.log("User Data:", formData);
+    setError("");
+    setMessage("");
+    setIsLoading(true);
 
-   // This is where we will send the form data to the backend server
+    try {
+      const data = await signupUser(formData);
+
+      console.log("Signup success:", data);
+      setMessage(data.message || "Account created successfully");
+    } catch (error) {
+      console.error("Signup error:", error);
+      setError(error.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,6 +57,7 @@ function Signup() {
             placeholder="Enter your name"
             value={formData.name}
             onChange={handleChange}
+            disabled={isLoading}
           />
         </div>
 
@@ -52,6 +69,7 @@ function Signup() {
             placeholder="Enter your email"
             value={formData.email}
             onChange={handleChange}
+            disabled={isLoading}
           />
         </div>
 
@@ -63,10 +81,16 @@ function Signup() {
             placeholder="Enter your password"
             value={formData.password}
             onChange={handleChange}
+            disabled={isLoading}
           />
         </div>
 
-        <button type="submit">Create Account</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {message && <p style={{ color: "green" }}>{message}</p>}
+
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Creating..." : "Create Account"}
+        </button>
       </form>
     </div>
   );
