@@ -8,14 +8,12 @@ import DesignForm from "./components/DesignForm";
 function App() {
   return (
     <Router>
-      <div className="app-container">
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/select-role" element={<SelectRole />} />
-          <Route path="/design-form" element={<DesignForm />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/select-role" element={<SelectRole />} />
+        <Route path="/design-form" element={<DesignForm />} />
+      </Routes>
     </Router>
   );
 }
