@@ -1,7 +1,7 @@
-import PhoneOtpVerification from "./pages/PhoneOtpVerification";
+import Login from "./pages/auth/Login";
 
 function App() {
-  return <PhoneOtpVerification />;
+  return <Login />;
 }
 
 export default App;
