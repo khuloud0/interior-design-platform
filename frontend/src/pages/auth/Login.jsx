@@ -8,6 +8,7 @@ function Login() {
   });
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -15,6 +16,9 @@ function Login() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+    setError("");
+    setSuccess("");
   };
 
   const handleSubmit = async (e) => {
@@ -22,10 +26,12 @@ function Login() {
 
     if (!formData.email || !formData.password) {
       setError("All fields are required");
+      setSuccess("");
       return;
     }
 
     setError("");
+    setSuccess("");
     setIsLoading(true);
 
     try {
@@ -35,10 +41,14 @@ function Login() {
 
       if (data.token) {
         localStorage.setItem("token", data.token);
+        setSuccess("Login successful ✅");
+      } else {
+        setError("Login succeeded, but no token was received");
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError(error.message || "Something went wrong");
+      console.error("Login error:", error);
+      setError(error.message || "Login failed");
+      setSuccess("");
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +86,7 @@ function Login() {
         <br />
 
         {error && <p style={{ color: "red" }}>{error}</p>}
+        {success && <p style={{ color: "green" }}>{success}</p>}
 
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Logging in..." : "Login"}
