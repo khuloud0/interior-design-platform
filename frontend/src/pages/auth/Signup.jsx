@@ -5,7 +5,9 @@ function Signup() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
+    role: "client",
   });
 
   const [error, setError] = useState("");
@@ -17,13 +19,23 @@ function Signup() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+
+    setError("");
+    setMessage("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.password) {
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.password ||
+      !formData.role
+    ) {
       setError("All fields are required");
+      setMessage("");
       return;
     }
 
@@ -35,10 +47,11 @@ function Signup() {
       const data = await signupUser(formData);
 
       console.log("Signup success:", data);
-      setMessage(data.message || "Account created successfully");
+      setMessage(data.message || "Account created successfully ✅");
     } catch (error) {
       console.error("Signup error:", error);
-      setError(error.message || "Something went wrong");
+      setError(error.message || "Signup failed");
+      setMessage("");
     } finally {
       setIsLoading(false);
     }
@@ -61,6 +74,8 @@ function Signup() {
           />
         </div>
 
+        <br />
+
         <div>
           <label>Email</label>
           <input
@@ -73,6 +88,22 @@ function Signup() {
           />
         </div>
 
+        <br />
+
+        <div>
+          <label>Phone</label>
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Enter your phone"
+            value={formData.phone}
+            onChange={handleChange}
+            disabled={isLoading}
+          />
+        </div>
+
+        <br />
+
         <div>
           <label>Password</label>
           <input
@@ -84,6 +115,23 @@ function Signup() {
             disabled={isLoading}
           />
         </div>
+
+        <br />
+
+        <div>
+          <label>Role</label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            disabled={isLoading}
+          >
+            <option value="client">Client</option>
+            <option value="designer">Designer</option>
+          </select>
+        </div>
+
+        <br />
 
         {error && <p style={{ color: "red" }}>{error}</p>}
         {message && <p style={{ color: "green" }}>{message}</p>}
