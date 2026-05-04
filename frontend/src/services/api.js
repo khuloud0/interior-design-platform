@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 async function request(endpoint, options = {}) {
   try {
@@ -30,7 +30,7 @@ export function loginUser(userData) {
 }
 
 export function signupUser(userData) {
-  return request("/auth/signup", {
+  return request("/auth/register", {
     method: "POST",
     body: JSON.stringify(userData),
   });
@@ -44,22 +44,11 @@ export function submitDesignRequest(requestData) {
 }
 
 export function verifyPhone(phone) {
-  return fetch("http://127.0.0.1:8000/auth/verify-phone", {
+  return request("/auth/verify-phone", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       phone,
       verified: true,
     }),
-  }).then(async (response) => {
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Phone verification failed");
-    }
-
-    return data;
   });
 }
