@@ -85,6 +85,9 @@ def login_user(data):
     if not bcrypt.check_password_hash(user.password_hash, data["password"]):
         return {"error": "Invalid email or password"}, 401
 
+    if not user.phone_verified:
+        return {"error": "Please verify your phone number before login"}, 403
+
     token = generate_token(user.id, user.role)
 
     return {
@@ -94,7 +97,9 @@ def login_user(data):
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "phone": user.phone,
             "role": user.role,
+            "phone_verified": user.phone_verified,
         },
     }, 200
 
