@@ -14,9 +14,9 @@ class DesignRequest(db.Model):
     )
 
     designer_id = db.Column(
-    db.Integer,
-    db.ForeignKey("users.id"),
-    nullable=True
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=True
     )
 
     service_type = db.Column(
@@ -54,7 +54,6 @@ class DesignRequest(db.Model):
     # execution_plan_ready
     # offers_ready
     # completed
-
     status = db.Column(
         db.String(50),
         nullable=False,
@@ -76,39 +75,40 @@ class DesignRequest(db.Model):
     )
 
     homeowner = db.relationship(
-    "User",
-    foreign_keys=[homeowner_id],
-    backref=db.backref("design_requests", lazy=True)
-)
+        "User",
+        foreign_keys=[homeowner_id],
+        backref=db.backref("design_requests", lazy=True)
+    )
 
     designer = db.relationship(
-    "User",
-    foreign_keys=[designer_id]
-)
-def to_dict(self):
-    return {
-        "id": self.id,
+        "User",
+        foreign_keys=[designer_id]
+    )
 
-        "client_name": (
-            self.homeowner.name
-            if self.homeowner
-            else None
-        ),
+    def to_dict(self):
+        return {
+            "id": self.id,
 
-        "space_type": self.space_type,
+            "client_name": (
+                self.homeowner.name
+                if self.homeowner
+                else None
+            ),
 
-        "preferred_style": self.preferred_style,
+            "space_type": self.space_type,
 
-        "budget": self.budget,
+            "preferred_style": self.preferred_style,
 
-        "status": self.status,
+            "budget": self.budget,
 
-        "created_at": (
-            self.created_at.isoformat()
-            if self.created_at
-            else None
-        ),
-    }
+            "status": self.status,
+
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at
+                else None
+            ),
+        }
 
     def __repr__(self):
         return f"<DesignRequest id={self.id} homeowner_id={self.homeowner_id}>"
