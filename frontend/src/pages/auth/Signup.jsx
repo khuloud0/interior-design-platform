@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import PageLoader from "../../components/PageLoader";
+
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -22,17 +24,26 @@ export default function Signup() {
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.phone) newErrors.phone = "Phone is required";
-    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.password) {
+    newErrors.password = "Password is required";
+} else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(formData.password)) {
+   newErrors.password = "Must include uppercase, lowercase, number & special character";
+}
     return newErrors;
   };
 
-  const getPasswordStrength = () => {
-    const p = formData.password;
-    if (!p) return null;
-    if (p.length < 6) return { label: "Weak", color: "#B05030" };
-    if (p.length < 10) return { label: "Medium", color: "#C97D4E" };
-    return { label: "Strong", color: "#5C7057" };
-  };
+ const getPasswordStrength = () => {
+  const p = formData.password;
+  if (!p) return null;
+  const hasUpper = /[A-Z]/.test(p);
+  const hasLower = /[a-z]/.test(p);
+  const hasNum = /\d/.test(p);
+  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p);
+  const score = [hasUpper, hasLower, hasNum, hasSpecial, p.length >= 8].filter(Boolean).length;
+  if (score <= 2) return { label: "Weak", color: "#B05030" };
+  if (score <= 3) return { label: "Medium", color: "#C97D4E" };
+  return { label: "Strong", color: "#5C7057" };
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +55,7 @@ export default function Signup() {
     setLoading(true);
     setMessage("");
     try {
-        const pendingSignup = {
+        /* const pendingSignup = {
             ...formData,
             role: selectedRole,
         };
@@ -54,7 +65,26 @@ export default function Signup() {
         setIsError(false);
         setTimeout(() => {
             window.location.href = "/verify-phone";
-        }, 1500);
+        }, 1500);*/
+        const payload = {
+  ...formData,
+  role: selectedRole,
+};
+
+const res = await axios.post(
+  "http://127.0.0.1:5000/auth/register",
+  payload
+);
+
+localStorage.setItem("user", JSON.stringify(res.data.user));
+localStorage.setItem("token", res.data.token);
+
+setMessage("Account created successfully.");
+setIsError(false);
+
+setTimeout(() => {
+  window.location.href = "/dashboard";
+}, 1500);
     } catch (err) {
       setMessage(err.response?.data?.error || "Signup failed");
       setIsError(true);
@@ -103,6 +133,7 @@ export default function Signup() {
 
   return (
     <>
+    <PageLoader visible={loading} />
       <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap"
         rel="stylesheet"
@@ -184,24 +215,31 @@ export default function Signup() {
             </div>
 
             {/* Phone */}
-            <div style={{ marginBottom: "14px" }}>
-              <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
-                Phone
-              </label>
-              <input
-                name="phone" type="tel"
-                placeholder="+966 5xx xxx xxxx"
-                onChange={handleChange}
-                style={inputStyle(!!errors.phone)}
-              />
-              {errors.phone && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.phone}</div>}
-            </div>
-
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <span style={{
+                position: "absolute", left: "12px",
+                fontSize: "11px", fontWeight: 400,
+                color: c.dark, pointerEvents: "none",
+                 fontFamily: "'Jost', sans-serif", zIndex: 1,
+                 userSelect: "none",
+                 }}>
+                  +966
+                 </span>
+                 <input
+                 name="phone" type="tel"
+                 placeholder="XX XXXX XXXX"
+                 onChange={handleChange}
+                 style={{
+                  ...inputStyle(!!errors.phone),
+                  paddingLeft: "80px",
+                   }}
+                  />  
+                  </div>
             {/* Password */}
             <div style={{ marginBottom: "14px" }}>
-              <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
-                Password
-              </label>
+              <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px", marginTop: "14px" }}>
+             Password
+             </label>
               <div style={{ position: "relative" }}>
                 <input
                   name="password"

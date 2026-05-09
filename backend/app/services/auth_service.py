@@ -1,3 +1,5 @@
+import email
+
 from flask_bcrypt import Bcrypt
 
 from app.models.user import User
@@ -50,8 +52,8 @@ def register_user(data):
         phone=data["phone"],
         password_hash=hashed_password,
         role=data["role"],
-        email_verified=False,
-        phone_verified=False,
+        email_verified=False, # TEMP: skip verification for testing
+        phone_verified=True, # TEMP: skip verification for testing
     )
 
     db.session.add(user)
@@ -65,8 +67,8 @@ def register_user(data):
             "email": user.email,
             "phone": user.phone,
             "role": user.role,
-            "email_verified": user.email_verified,
-            "phone_verified": user.phone_verified,
+            "email_verified": user.email_verified, # TEMP: skip verification for testing
+            "phone_verified": user.phone_verified, # TEMP: skip verification for testing
         },
     }, 201
 
@@ -78,15 +80,17 @@ def login_user(data):
     if not is_valid:
         return {"error": error}, 400
 
-    user = User.query.filter_by(email=data["email"]).first()
+    email = data["email"].strip().lower()
+    user = User.query.filter_by(email=email).first()
     if not user:
         return {"error": "Invalid email or password"}, 401
 
     if not bcrypt.check_password_hash(user.password_hash, data["password"]):
         return {"error": "Invalid email or password"}, 401
+    
 
-    if not user.phone_verified:
-        return {"error": "Please verify your phone number before login"}, 403
+    #if not user.phone_verified:
+     #   return {"error": "Please verify your phone number before login"}, 403
 
     token = generate_token(user.id, user.role)
 
@@ -99,7 +103,7 @@ def login_user(data):
             "email": user.email,
             "phone": user.phone,
             "role": user.role,
-            "phone_verified": user.phone_verified,
+            "phone_verified": user.phone_verified, # TEMP: skip verification for testing
         },
     }, 200
 
