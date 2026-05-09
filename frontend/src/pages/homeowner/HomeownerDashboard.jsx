@@ -236,7 +236,42 @@ const fetchData = async () => {
       `}</style>
 
       <div style={{ minHeight: "100vh", background: c.bg, padding: "28px 24px", fontFamily: "'Jost', sans-serif" }}>
-        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+  <div style={{ maxWidth: 680, margin: "0 auto" }}>
+
+    {/* ── BACK / HOME ── */}
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          padding: "7px 16px",
+          borderRadius: 8,
+          border: `0.5px solid ${c.border}`,
+          background: "transparent",
+          color: c.stone,
+          fontSize: 11,
+          fontFamily: "'Jost', sans-serif",
+          cursor: "pointer",
+        }}
+      >
+        ← Back
+      </button>
+
+      <button
+        onClick={() => navigate("/")}
+        style={{
+          padding: "7px 16px",
+          borderRadius: 8,
+          border: `0.5px solid ${c.border}`,
+          background: "transparent",
+          color: c.stone,
+          fontSize: 11,
+          fontFamily: "'Jost', sans-serif",
+          cursor: "pointer",
+        }}
+      >
+        Home
+      </button>
+    </div>
 
           {/* Navbar */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>

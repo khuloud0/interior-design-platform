@@ -144,7 +144,7 @@ export default function CreateRequest() {
       const token = localStorage.getItem("token");
       const url = editMode
      ? `http://127.0.0.1:5000/design-requests/${existingRequest.id}`
-    : "http://127.0.0.1:5000/design-requests";
+     : "http://127.0.0.1:5000/design-requests";
 
       const method = editMode ? "PUT" : "POST";
 
@@ -155,17 +155,17 @@ export default function CreateRequest() {
       Authorization: `Bearer ${token}`,
      },
      body: JSON.stringify(payload),
-     });
+});
       const data = await res.json();
       if (!res.ok) {
-        setMessage(
-        editMode
-       ? "Request updated successfully!"
-       : "Request submitted successfully!"
-     );
+        setMessage(data.error || "Failed to submit request.");
         setIsError(true);
       } else {
-        setMessage("Request submitted successfully!");
+        setMessage(
+        editMode
+        ? "Request updated successfully!"
+        : "Request submitted successfully!"
+     );
         setIsError(false);
         setTimeout(() => { navigate("/dashboard"); }, 1500);
       }
@@ -235,7 +235,44 @@ export default function CreateRequest() {
       `}</style>
 
       <div style={{ minHeight: "100vh", background: c.bg, padding: "32px 20px", fontFamily: "'Jost', sans-serif" }}>
-        <div style={{ maxWidth: 580, margin: "0 auto" }}>
+  <div style={{ maxWidth: 580, margin: "0 auto" }}>
+
+    {/* ── BACK / HOME ── */}
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          padding: "7px 16px",
+          borderRadius: 8,
+          border: `0.5px solid ${c.border}`,
+          background: "transparent",
+          color: c.stone,
+          fontSize: 11,
+          fontFamily: "'Jost', sans-serif",
+          cursor: "pointer",
+        }}
+      >
+        ← Back
+      </button>
+
+      <button
+        onClick={() => navigate("/")}
+        style={{
+          padding: "7px 16px",
+          borderRadius: 8,
+          border: `0.5px solid ${c.border}`,
+          background: "transparent",
+          color: c.stone,
+          fontSize: 11,
+          fontFamily: "'Jost', sans-serif",
+          cursor: "pointer",
+        }}
+      >
+        Home
+      </button>
+    </div>
+
+    {/* Main card */}
 
           {/* Main card */}
           <div style={{ background: "#fff", border: `0.5px solid ${c.border}`, borderRadius: 18, overflow: "hidden", marginBottom: 16 }}>
@@ -439,46 +476,11 @@ export default function CreateRequest() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Attachments */}
-                  <div style={{ marginBottom: 22 }}>
-                    <SectionDivider label="Attachments" optional />
-                    {[
-                      { title: "Inspiration images", hint: "JPG, PNG · up to 10 files", accept: "image/*", multiple: true, isImg: true },
-                      { title: "Floor plan", hint: "PDF, DWG, PNG, JPG", accept: ".pdf,.dwg,.png,.jpg", isImg: false },
-                    ].map(({ title, hint, accept, multiple, isImg }) => (
-                      <label
-                        key={title}
-                        style={{
-                          display: "flex", alignItems: "center", gap: 12, marginBottom: 8,
-                          border: `1px dashed ${c.sand}`, borderRadius: 10, padding: "13px 15px",
-                          background: c.inputBg, cursor: "pointer",
-                        }}
-                      >
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "#EDE5DC", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          {isImg ? (
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8C7B6B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                            </svg>
-                          ) : (
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8C7B6B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                          )}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 12, color: c.stone, fontWeight: 400 }}>{title}</div>
-                          <div style={{ fontSize: 10.5, color: c.muted, marginTop: 2 }}>{hint}</div>
-                        </div>
-                        <span style={{ fontSize: 11, color: c.muted }}>Browse</span>
-                        <input type="file" accept={accept} multiple={multiple} style={{ display: "none" }} />
-                      </label>
-                    ))}
-                  </div>
                 </div>
               )}
 
-              {/* Navigation */}
+              {/* Navigation */} 
+
               <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
                 {step > 0 && (
                   <button
@@ -550,7 +552,7 @@ export default function CreateRequest() {
                 </div>
               )}
             </div>
-          </div>
+              </div>
 
           {/* What happens next */}
           <div style={{ background: "#fff", border: `0.5px solid ${c.border}`, borderRadius: 18, padding: "24px 32px 28px" }}>

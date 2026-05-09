@@ -14,12 +14,9 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
-
     if "phone" in data:
-        data["phone"] = "+966" + data["phone"].replace(" ", "").replace("+966", "")
-
-    response, status_code = register_user(data)
-    return jsonify(response), status_code
+        data["phone"] = "+966" + data["phone"].replace(" ", "")
+        response, status_code = register_user(data)
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
