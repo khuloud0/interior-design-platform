@@ -1,23 +1,28 @@
-from flask import Flask
+kfrom flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from flask_migrate import Migrate
 
 db = SQLAlchemy()
 jwt = JWTManager()
-migrate = Migrate()
 
 
 def create_app():
     app = Flask(__name__)
 
     app.config.from_object("app.config.DevelopmentConfig")
-    CORS(app)
+
+    CORS(app, resources={
+        r"/*": {
+            "origins": [
+                "http://localhost:5173",
+                "http://127.0.0.1:5173"
+            ]
+        }
+    })
 
     db.init_app(app)
     jwt.init_app(app)
-    migrate.init_app(app, db)
 
     from app.models import (
         User,
@@ -25,6 +30,7 @@ def create_app():
         DesignerProfile,
         DesignRequest,
         ExecutionPlan,
+        DesignRequestAttachment,
     )
 
     with app.app_context():
