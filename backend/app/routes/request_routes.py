@@ -1,21 +1,49 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.services.request_service import (
+    create_design_request,
+    get_all_design_requests,
+    get_design_request_by_id,
+    update_design_request,
+    accept_design_request,
+    get_available_design_requests,
+)
 
-request_bp = Blueprint('request_bp', __name__)
+design_request_bp = Blueprint("design_request_bp", __name__)
 
-@request_bp.route('/design-requests', methods=['POST'])
-def create_design_request():
+@design_request_bp.route("/design-requests", methods=["POST"])
+def create_request():
     data = request.get_json()
+    response, status_code = create_design_request(data)
+    return jsonify(response), status_code
 
-    # validation
-    required_fields = ["space_details", "user_needs", "preferences", "budget"]
+@design_request_bp.route("/design-requests", methods=["GET"])
+def get_requests():
+    response, status_code = get_all_design_requests()
+    return jsonify(response), status_code
 
-    for field in required_fields:
-        if field not in data or not data[field]:
-            return jsonify({"error": "All required fields must be provided"}), 400
+@design_request_bp.route("/design-requests/<int:request_id>", methods=["GET"])
+def get_request_by_id(request_id):
+    response, status_code = get_design_request_by_id(request_id)
+    return jsonify(response), status_code
 
-    if int(data["budget"]) <= 0:
-        return jsonify({"error": "Budget must be a positive number"}), 400
+@design_request_bp.route("/design-requests/<int:request_id>", methods=["PUT"])
+def update_request(request_id):
+    data = request.get_json()
+    response, status_code = update_design_request(request_id, data)
+    return jsonify(response), status_code
 
-    return jsonify({
-        "message": "Design request created successfully"
-    }), 201
+@design_request_bp.route("/design-requests/<int:request_id>/accept", methods=["POST"])
+def accept_request(request_id):
+    data = request.get_json()
+    designer_id = data.get("designer_id")
+    response, status_code = accept_design_request(request_id, designer_id)
+    return jsonify(response), status_code
+
+@design_request_bp.route("/designer/available-requests", methods=["GET"])
+@jwt_required()
+def get_available_requests():
+    identity = get_jwt_identity()
+    designer_id = identity["user_id"]
+    response, status_code = get_available_design_requests(designer_id)
+    return jsonify(response), status_code
