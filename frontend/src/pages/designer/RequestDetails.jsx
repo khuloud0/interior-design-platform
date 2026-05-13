@@ -15,7 +15,13 @@ const RequestDetailsPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const requestId = window.location.pathname.split("/").filter(Boolean).pop() || 15;
+  const [actionLoading, setActionLoading] = useState("");
+  const [actionMessage, setActionMessage] = useState("");
+  const [actionError, setActionError] = useState("");
+
+  const requestId =
+    window.location.pathname.split("/").filter(Boolean).pop() || 15;
+
   const API_URL = `http://localhost:5000/design-requests/${requestId}`;
 
   useEffect(() => {
@@ -43,6 +49,83 @@ const RequestDetailsPage = () => {
 
     fetchRequestDetails();
   }, [API_URL]);
+
+  const handleRequestAction = async (action) => {
+    const isAccept = action === "accept";
+    const confirmed = window.confirm(
+      isAccept
+        ? "Are you sure you want to accept this request?"
+        : "Are you sure you want to reject this request?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setActionLoading(action);
+      setActionMessage("");
+      setActionError("");
+
+      const response = await fetch(`${API_URL}/${action}`, {
+        method: isAccept ? "POST" : "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setActionError(data.error || "Unable to update request status");
+        return;
+      }
+
+      setActionMessage(
+        data.message ||
+          (isAccept
+            ? "Request accepted successfully"
+            : "Request rejected successfully")
+      );
+
+      setRequest((prev) => ({
+        ...prev,
+        status: isAccept ? "accepted" : "rejected",
+      }));
+    } catch (error) {
+      setActionError("Unable to connect to backend. Please try again.");
+      console.error("Action error:", error);
+    } finally {
+      setActionLoading("");
+    }
+  };
+
+  const formatBudget = (budget) => {
+    if (budget === undefined || budget === null || budget === "") {
+      return "N/A";
+    }
+
+    return `${Number(budget).toLocaleString()} SAR`;
+  };
+
+  const getStatusStyle = (status) => {
+    if (status === "accepted") {
+      return {
+        backgroundColor: "#E8F5E9",
+        color: "#2E7D32",
+      };
+    }
+
+    if (status === "rejected") {
+      return {
+        backgroundColor: "#FFEBEE",
+        color: "#C62828",
+      };
+    }
+
+    return {
+      backgroundColor: "#FFF3E0",
+      color: "#E65100",
+    };
+  };
 
   const pageStyle = {
     minHeight: "100vh",
@@ -84,20 +167,39 @@ const RequestDetailsPage = () => {
     display: "inline-block",
     padding: "8px 14px",
     borderRadius: "10px",
-    backgroundColor: "#FFF3E0",
-    color: "#E65100",
     fontSize: "12px",
     fontWeight: "700",
     textTransform: "uppercase",
+    ...getStatusStyle(request.status),
   };
 
-  const formatBudget = (budget) => {
-    if (budget === undefined || budget === null || budget === "") {
-      return "N/A";
-    }
-
-    return `${Number(budget).toLocaleString()} SAR`;
+  const primaryButtonStyle = {
+    width: "100%",
+    border: "none",
+    backgroundColor: "#2C221A",
+    color: "#FFFDF9",
+    borderRadius: "10px",
+    padding: "14px 18px",
+    cursor: "pointer",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   };
+
+  const secondaryButtonStyle = {
+    width: "100%",
+    border: "2px solid #2C221A",
+    backgroundColor: "transparent",
+    color: "#2C221A",
+    borderRadius: "10px",
+    padding: "12px 18px",
+    cursor: "pointer",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  };
+
+  const isPending = request.status === "pending";
 
   return (
     <div style={pageStyle}>
@@ -244,6 +346,79 @@ const RequestDetailsPage = () => {
             </p>
           )}
         </div>
+
+        {isPending ? (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: "16px",
+              marginBottom: "24px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => handleRequestAction("accept")}
+              disabled={actionLoading !== ""}
+              style={{
+                ...primaryButtonStyle,
+                opacity: actionLoading ? 0.7 : 1,
+                cursor: actionLoading ? "not-allowed" : "pointer",
+              }}
+            >
+              {actionLoading === "accept" ? "Processing..." : "Accept Request"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleRequestAction("reject")}
+              disabled={actionLoading !== ""}
+              style={{
+                ...secondaryButtonStyle,
+                opacity: actionLoading ? 0.7 : 1,
+                cursor: actionLoading ? "not-allowed" : "pointer",
+              }}
+            >
+              {actionLoading === "reject" ? "Processing..." : "Reject Request"}
+            </button>
+          </div>
+        ) : (
+          <div style={cardStyle}>
+            <p style={{ color: "#8C7B68", margin: 0 }}>
+              This request has already been {request.status}.
+            </p>
+          </div>
+        )}
+
+        {actionMessage && (
+          <div
+            style={{
+              border: "1px solid #C8E6C9",
+              backgroundColor: "#E8F5E9",
+              color: "#2E7D32",
+              borderRadius: "10px",
+              padding: "14px 16px",
+              marginBottom: "24px",
+            }}
+          >
+            {actionMessage}
+          </div>
+        )}
+
+        {actionError && (
+          <div
+            style={{
+              border: "1px solid #FFCDD2",
+              backgroundColor: "#FFEBEE",
+              color: "#C62828",
+              borderRadius: "10px",
+              padding: "14px 16px",
+              marginBottom: "24px",
+            }}
+          >
+            {actionError}
+          </div>
+        )}
       </div>
     </div>
   );
