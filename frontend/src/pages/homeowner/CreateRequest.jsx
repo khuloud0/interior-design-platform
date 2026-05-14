@@ -134,6 +134,7 @@ export default function CreateRequest() {
       const user = JSON.parse(localStorage.getItem("user"));
       const payload = {
         homeowner_id: user?.id,
+        designer_id: location.state?.designer_id || null,
         service_type: form.service_type,
         space_type: form.space_type,
         space_details: form.space_details,
