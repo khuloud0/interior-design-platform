@@ -1,4 +1,4 @@
-
+from flask import Flask
 from flask sqlalchemy import SOLAlchemy
 from flask_jwt_extended import JWTManager
 
