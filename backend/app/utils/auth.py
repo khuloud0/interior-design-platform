@@ -1,18 +1,28 @@
-from flask_jwt_extended import create_access_token, verify_jwt_in_request, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token,
+    verify_jwt_in_request,
+    get_jwt,
+)
 
 
 def generate_token(user_id, role):
-    identity = {
-        "user_id": user_id,
-        "role": role
-    }
-
-    return create_access_token(identity=identity)
+    return create_access_token(
+        identity=str(user_id),
+        additional_claims={
+            "user_id": user_id,
+            "role": role
+        }
+    )
 
 
 def get_current_user():
     verify_jwt_in_request()
-    return get_jwt_identity()
+    claims = get_jwt()
+
+    return {
+        "user_id": claims.get("user_id"),
+        "role": claims.get("role")
+    }
 
 
 def get_current_user_role():

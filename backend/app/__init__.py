@@ -39,9 +39,11 @@ def create_app():
     from app.routes.auth_routes import auth_bp
     from app.routes.request_routes import design_request_bp
     from app.routes.designer_routes import designer_bp
-
+    from app.routes.plan_routes import plan_bp
+    
     app.register_blueprint(auth_bp)
     app.register_blueprint(design_request_bp)
     app.register_blueprint(designer_bp)
-
+    app.register_blueprint(plan_bp)
+    
     return app
