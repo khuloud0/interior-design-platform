@@ -6,6 +6,9 @@ from flask_cors import CORS
 db = SQLAlchemy()
 jwt = JWTManager()
 
+@jwt.unauthorized_loader
+def unauthorized_response(callback):
+    return {"error": "Unauthorized"}, 401
 
 def create_app():
     app = Flask(__name__)
@@ -30,6 +33,7 @@ def create_app():
         DesignerProfile,
         DesignRequest,
         ExecutionPlan,
+        ExecutionStep,
         DesignRequestAttachment,
     )
 
@@ -40,10 +44,12 @@ def create_app():
     from app.routes.request_routes import design_request_bp
     from app.routes.designer_routes import designer_bp
     from app.routes.plan_routes import plan_bp
+    from app.routes.step_routes import step_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(design_request_bp)
     app.register_blueprint(designer_bp)
     app.register_blueprint(plan_bp)
-    
+    app.register_blueprint(step_bp)
+
     return app

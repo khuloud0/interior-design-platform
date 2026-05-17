@@ -1,1 +1,51 @@
+from app import db
+from app.models.execution_step import ExecutionStep
+from app.models.execution_plan import ExecutionPlan
 
+
+def create_execution_step(data, designer_id):
+    required_fields = [
+        "plan_id",
+        "description",
+        "step_order"
+    ]
+
+    for field in required_fields:
+        if field not in data or data[field] in [None, ""]:
+            return {"error": "All required fields must be provided"}, 400
+
+    execution_plan = ExecutionPlan.query.get(data["plan_id"])
+    if not execution_plan:
+        return {"error": "plan_id does not exist"}, 400
+
+    if execution_plan.designer_id != designer_id:
+        return {"error": "Forbidden"}, 403
+
+    try:
+        step_order = int(data["step_order"])
+    except (ValueError, TypeError):
+        return {"error": "step_order must be a positive integer"}, 400
+
+    if step_order <= 0:
+        return {"error": "step_order must be a positive integer"}, 400
+
+    status = data.get("status", "pending")
+
+    if status not in ["pending", "in_progress", "completed"]:
+        return {"error": "Invalid status value"}, 400
+
+    execution_step = ExecutionStep(
+        plan_id=data["plan_id"],
+        description=data["description"],
+        notes=data.get("notes"),
+        step_order=step_order,
+        status=status
+    )
+
+    db.session.add(execution_step)
+    db.session.commit()
+
+    return {
+        "message": "Execution step created successfully",
+        "step_id": execution_step.id
+    }, 201
