@@ -5,3 +5,4 @@ from app.models.design_request import DesignRequest
 from app.models.design_request_attachments import DesignRequestAttachment
 from app.models.execution_plan import ExecutionPlan
 from app.models.execution_step import ExecutionStep
+from app.models.offer import Offer
