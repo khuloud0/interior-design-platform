@@ -34,6 +34,7 @@ def create_app():
         DesignRequest,
         ExecutionPlan,
         ExecutionStep,
+        Offer,
         DesignRequestAttachment,
     )
 
@@ -45,11 +46,13 @@ def create_app():
     from app.routes.designer_routes import designer_bp
     from app.routes.plan_routes import plan_bp
     from app.routes.step_routes import step_bp
+    from app.routes.offer_routes import offer_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(design_request_bp)
     app.register_blueprint(designer_bp)
     app.register_blueprint(plan_bp)
     app.register_blueprint(step_bp)
-
+    app.register_blueprint(offer_bp)
+    
     return app
