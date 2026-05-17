@@ -6,3 +6,4 @@ from app.models.design_request_attachments import DesignRequestAttachment
 from app.models.execution_plan import ExecutionPlan
 from app.models.execution_step import ExecutionStep
 from app.models.offer import Offer
+from app.models.selected_offer import SelectedOffer
