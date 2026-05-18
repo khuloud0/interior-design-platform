@@ -1,113 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
-import PageLoader from "../../components/PageLoader";
-
+import signupImg from "../../assets/images/SignupSideImage.svg";
+import logo from "../../assets/images/Logo130_27.svg";
+import { User, Mail, Phone, Eye, EyeOff } from "lucide-react";
 
 export default function Signup() {
-  const [formData, setFormData] = useState({
-    name: "", email: "", phone: "", password: "",
-  });
-  const [message, setMessage] = useState("");
-  const [isError, setIsError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
+  const [message, setMessage]           = useState("");
+  const [isError, setIsError]           = useState(false);
+  const [loading, setLoading]           = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors]             = useState({});
   const [selectedRole, setSelectedRole] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.phone) newErrors.phone = "Phone is required";
-    if (!formData.password) {
-    newErrors.password = "Password is required";
-} else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(formData.password)) {
-   newErrors.password = "Must include uppercase, lowercase, number & special character";
-}
-    return newErrors;
-  };
-
- const getPasswordStrength = () => {
-  const p = formData.password;
-  if (!p) return null;
-  const hasUpper = /[A-Z]/.test(p);
-  const hasLower = /[a-z]/.test(p);
-  const hasNum = /\d/.test(p);
-  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p);
-  const score = [hasUpper, hasLower, hasNum, hasSpecial, p.length >= 8].filter(Boolean).length;
-  if (score <= 2) return { label: "Weak", color: "#B05030" };
-  if (score <= 3) return { label: "Medium", color: "#C97D4E" };
-  return { label: "Strong", color: "#5C7057" };
-};
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-    setLoading(true);
-    setMessage("");
-    try {
-        /* const pendingSignup = {
-            ...formData,
-            role: selectedRole,
-        };
-        localStorage.setItem("pendingSignup", JSON.stringify(pendingSignup));
-        localStorage.setItem("signupPhone", formData.phone);
-        setMessage("Phone verification required.");
-        setIsError(false);
-        setTimeout(() => {
-            window.location.href = "/verify-phone";
-        }, 1500);*/
-        const payload = {
-  ...formData,
-  role: selectedRole,
-};
-
-const res = await axios.post(
-  "http://127.0.0.1:5000/auth/register",
-  payload
-);
-
-localStorage.setItem("user", JSON.stringify(res.data.user));
-localStorage.setItem("token", res.data.token);
-
-setMessage("Account created successfully.");
-setIsError(false);
-
-setTimeout(() => {
-  window.location.href = "/dashboard";
-}, 1500);
-    } catch (err) {
-      setMessage(err.response?.data?.error || "Signup failed");
-      setIsError(true);
-    } finally {
-      setLoading(false);
-    }
-    }
-
-  const strength = getPasswordStrength();
-  const isSubmitDisabled = !selectedRole || loading;
-
-  const EyeIcon = () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"/>
-      <circle cx="12" cy="12" r="3"/>
-    </svg>
-  );
-
-  const EyeOffIcon = () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M3 3l18 18M10.5 10.5A3 3 0 0013.5 13.5M2 12s4-6 10-6c1.5 0 3 .3 4.3.8M22 12s-4 6-10 6a11 11 0 01-4.3-.8"/>
-    </svg>
-  );
 
   const c = {
     bg: "#F7F3EE", card: "#FFFFFF", sand: "#D4C4B0",
@@ -115,239 +19,241 @@ setTimeout(() => {
     inputBg: "#FAF7F4", muted: "#A39080", error: "#B05030", success: "#5C7057",
   };
 
+  const inputWrap = { position: "relative", display: "flex", alignItems: "center" };
   const inputStyle = (hasError) => ({
-    width: "100%",
-    background: c.inputBg,
+    width: "100%", background: c.inputBg,
     border: `1px solid ${hasError ? c.error : c.border}`,
-    borderRadius: "8px",
-    padding: "9px 12px",
-    fontSize: "11px",
-    fontFamily: "'Jost', sans-serif",
-    fontWeight: 300,
-    color: c.dark,
-    outline: "none",
-    boxSizing: "border-box",
+    borderRadius: "8px", padding: "10px 36px 10px 12px",
+    fontSize: "12px", fontFamily: "'Jost', sans-serif",
+    fontWeight: 300, color: c.dark, outline: "none", boxSizing: "border-box",
   });
+  const iconStyle = {
+    position: "absolute", right: "11px", color: c.muted,
+    display: "flex", alignItems: "center", pointerEvents: "none",
+  };
 
   const roles = ["client", "designer", "provider"];
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!formData.name) e.name = "Name is required";
+    if (!formData.email) e.email = "Email is required";
+    if (!formData.phone) e.phone = "Phone is required";
+    if (!formData.password) {
+      e.password = "Password is required";
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(formData.password)) {
+      e.password = "Must include uppercase, lowercase, number & special character";
+    }
+    return e;
+  };
+
+  const getPasswordStrength = () => {
+    const p = formData.password;
+    if (!p) return null;
+    const score = [/[A-Z]/.test(p), /[a-z]/.test(p), /\d/.test(p),
+      /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p), p.length >= 8].filter(Boolean).length;
+    if (score <= 2) return { label: "Weak",   color: "#B05030" };
+    if (score <= 3) return { label: "Moderate", color: "#C97D4E" };
+    return              { label: "Strong", color: "#5C7057" };
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    localStorage.removeItem("user"); localStorage.removeItem("token");
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return; }
+    if (!selectedRole) { setErrors({ role: "Please select a role" }); return; }
+    setLoading(true); setMessage(""); setIsError(false);
+    try {
+      const res = await axios.post("http://127.0.0.1:5000/auth/register", { ...formData, role: selectedRole });
+      const user = res.data?.user; const token = res.data?.token;
+      if (!user) { setMessage("Signup failed. Please try again."); setIsError(true); return; }
+      const userWithRole = { ...user, role: selectedRole };
+      localStorage.setItem("user", JSON.stringify(userWithRole));
+      if (token) localStorage.setItem("token", token);
+      setMessage("Account created successfully."); setIsError(false);
+      setTimeout(() => {
+        window.location.href = userWithRole.role === "designer" ? "/designer/requests"
+          : userWithRole.role === "client" ? "/dashboard" : "/";
+      }, 1500);
+    } catch (err) {
+      localStorage.removeItem("user"); localStorage.removeItem("token");
+      setMessage(err.response?.data?.error || err.response?.data?.message || "This email or phone is already registered.");
+      setIsError(true);
+    } finally { setLoading(false); }
+  };
+
+  const strength = getPasswordStrength();
+  const isSubmitDisabled = !selectedRole || loading;
+
   return (
     <>
-    <PageLoader visible={loading} />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap"
-        rel="stylesheet"
-      />
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
       <style>{`
-        input::placeholder { color: #CFC0B0; font-size: 11px; font-weight: 300; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { margin: 0; padding: 0; }
+        input::placeholder { color: #CFC0B0; font-size: 12px; font-weight: 300; }
         input:focus { border-color: #8C7B6B !important; box-shadow: 0 0 0 3px rgba(140,123,107,0.1); background: #fff !important; }
-        .role-btn:hover { border-color: #8C7B6B; color: #8C7B6B; }
-        .submit-btn:not(:disabled):hover { background: #8C7B6B; }
+        .role-btn:hover { border-color: #8C7B6B !important; color: #8C7B6B !important; }
+        .submit-btn:not(:disabled):hover { background: #8C7B6B !important; }
+        .submit-btn { transition: background 0.2s; }
+        .signin-link:hover { color: #3D3128 !important; }
       `}</style>
 
-      <div style={{
-        minHeight: "100vh", background: c.bg, display: "flex",
-        alignItems: "center", justifyContent: "center",
-        fontFamily: "'Jost', sans-serif", padding: "24px",
-      }}>
+      <div style={{ height: "100vh", overflow: "hidden", display: "grid", gridTemplateColumns: "1fr 1fr", fontFamily: "'Jost', sans-serif" }}>
+
+        {/* LEFT — Image */}
+        <div style={{ overflow: "hidden" }}>
+          <img src={signupImg} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        </div>
+
+        {/* RIGHT — Form */}
         <div style={{
-          background: c.card, border: `1px solid ${c.border}`,
-          borderRadius: "12px", padding: "36px 36px 28px",
-          width: "100%", maxWidth: "400px",
-          boxShadow: "0 2px 24px rgba(61,49,40,0.07)",
+          background: c.card, display: "flex", flexDirection: "column",
+          justifyContent: "space-between", padding: "40px 64px 28px",
+          borderLeft: `1px solid ${c.border}`, overflowY: "auto",
         }}>
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: "9px", marginBottom: "20px" }}>
-            <div style={{
-              width: "28px", height: "28px", border: `1.5px solid ${c.sand}`,
-              borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <rect x="2" y="2" width="5" height="5" stroke="#8C7B6B" strokeWidth="1" rx="1"/>
-                <rect x="9" y="2" width="5" height="5" fill="#D4C4B0" rx="1"/>
-                <rect x="2" y="9" width="5" height="5" fill="#D4C4B0" rx="1"/>
-                <rect x="9" y="9" width="5" height="5" stroke="#8C7B6B" strokeWidth="1" rx="1"/>
-              </svg>
-            </div>
-            <span style={{
-              fontFamily: "'Cormorant Garamond', serif", fontSize: "16px",
-              fontWeight: 600, letterSpacing: "0.12em", color: c.dark, textTransform: "uppercase",
-            }}>Swagne</span>
-          </div>
-
-          {/* Header */}
-          <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif", fontSize: "24px",
-            fontWeight: 300, color: c.dark, marginBottom: "3px",
-          }}>Create an Account</h2>
-          <p style={{ fontSize: "12px", color: c.muted, fontWeight: 300, marginBottom: "16px" }}>
-            Begin your design journey with us.
-          </p>
-          <div style={{ width: "28px", height: "1px", background: c.sand, marginBottom: "18px" }}/>
-
-          <form onSubmit={handleSubmit}>
-            {/* Name */}
-            <div style={{ marginBottom: "14px" }}>
-              <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
-                Full Name
-              </label>
-              <input
-                name="name" type="text"
-                placeholder="Your name"
-                onChange={handleChange}
-                style={inputStyle(!!errors.name)}
-              />
-              {errors.name && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.name}</div>}
+          <div>
+            {/* Logo + Sign in link */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "40px" }}>
+              <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: "9px", textDecoration: "none" }}>
+                <img src={logo} alt="Swagne" style={{ height: "27px" }} />
+              </a>
+              <p style={{ fontSize: "12px", color: c.muted, fontWeight: 300, margin: 0 }}>
+                Already have an account?{" "}
+                <a href="/login" className="signin-link" style={{ color: c.stone, fontWeight: 500, textDecoration: "none" }}>Sign in</a>
+              </p>
             </div>
 
-            {/* Email */}
-            <div style={{ marginBottom: "14px" }}>
-              <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
-                Email
-              </label>
-              <input
-                name="email" type="email"
-                placeholder="you@example.com"
-                onChange={handleChange}
-                style={inputStyle(!!errors.email)}
-              />
-              {errors.email && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.email}</div>}
-            </div>
+            {/* Title */}
+            <h1 style={{
+              fontFamily: "'Cormorant Garamond', serif", fontSize: "40px",
+              fontWeight: 400, color: c.dark, marginBottom: "28px", lineHeight: 1.15,
+            }}>Create your account</h1>
 
-            {/* Phone */}
-            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-              <span style={{
-                position: "absolute", left: "12px",
-                fontSize: "11px", fontWeight: 400,
-                color: c.dark, pointerEvents: "none",
-                 fontFamily: "'Jost', sans-serif", zIndex: 1,
-                 userSelect: "none",
-                 }}>
-                  +966
-                 </span>
-                 <input
-                 name="phone" type="tel"
-                 placeholder="XX XXXX XXXX"
-                 onChange={handleChange}
-                 style={{
-                  ...inputStyle(!!errors.phone),
-                  paddingLeft: "80px",
-                   }}
-                  />  
-                  </div>
-            {/* Password */}
-            <div style={{ marginBottom: "14px" }}>
-              <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px", marginTop: "14px" }}>
-             Password
-             </label>
-              <div style={{ position: "relative" }}>
-                <input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Min. 8 characters"
-                  onChange={handleChange}
-                  style={{ ...inputStyle(!!errors.password), paddingRight: "38px" }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: "absolute", right: "10px", top: "50%",
-                    transform: "translateY(-50%)", background: "none",
-                    border: "none", cursor: "pointer", color: c.muted,
-                    display: "flex", alignItems: "center",
-                  }}
-                >
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
+            <form onSubmit={handleSubmit}>
+              {/* Full Name */}
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Full Name</label>
+                <div style={inputWrap}>
+                  <input name="name" type="text" placeholder="Enter your full name" onChange={handleChange} style={inputStyle(!!errors.name)} />
+                  <span style={iconStyle}><User size={14} strokeWidth={1.5} /></span>
+                </div>
+                {errors.name && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.name}</div>}
               </div>
-              {strength && (
-                <>
-                  <div style={{ display: "flex", gap: "3px", marginTop: "6px" }}>
-                    {[1, 2, 3].map((i) => (
+
+              {/* Email */}
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Email</label>
+                <div style={inputWrap}>
+                  <input name="email" type="email" placeholder="Enter your email address" onChange={handleChange} style={inputStyle(!!errors.email)} />
+                  <span style={iconStyle}><Mail size={14} strokeWidth={1.5} /></span>
+                </div>
+                {errors.email && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.email}</div>}
+              </div>
+
+              {/* Phone */}
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Phone</label>
+                <div style={inputWrap}>
+                  <span style={{
+                    position: "absolute", left: "12px", fontSize: "12px", fontWeight: 400,
+                    color: c.dark, pointerEvents: "none", zIndex: 1, userSelect: "none",
+                    borderRight: `1px solid ${c.border}`, paddingRight: "10px",
+                  }}>+966</span>
+                  <input name="phone" type="tel" placeholder="Enter your phone number" onChange={handleChange}
+                    style={{ ...inputStyle(!!errors.phone), paddingLeft: "58px", paddingRight: "36px" }} />
+                  <span style={iconStyle}><Phone size={14} strokeWidth={1.5} /></span>
+                </div>
+                {errors.phone && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.phone}</div>}
+              </div>
+
+              {/* Password */}
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Password</label>
+                <div style={inputWrap}>
+                  <input name="password" type={showPassword ? "text" : "password"}
+                    placeholder="Create a password" onChange={handleChange}
+                    style={{ ...inputStyle(!!errors.password), paddingRight: "36px" }} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: "absolute", right: "11px", background: "none", border: "none", cursor: "pointer", color: c.muted, display: "flex", alignItems: "center", padding: 0 }}>
+                    {showPassword ? <EyeOff size={14} strokeWidth={1.5} /> : <Eye size={14} strokeWidth={1.5} />}
+                  </button>
+                </div>
+                {strength && (
+                  <div style={{ display: "flex", gap: "3px", marginTop: "6px", alignItems: "center" }}>
+                    {[1, 2, 3].map(i => (
                       <div key={i} style={{
                         height: "2px", flex: 1, borderRadius: "1px",
-                        background: (
-                          i === 1 ? strength.color :
-                          i === 2 && strength.label !== "Weak" ? strength.color :
-                          i === 3 && strength.label === "Strong" ? strength.color :
-                          c.border
-                        ),
+                        background: i === 1 ? strength.color
+                          : i === 2 && strength.label !== "Weak" ? strength.color
+                          : i === 3 && strength.label === "Strong" ? strength.color : c.border,
                         transition: "background 0.3s",
-                      }}/>
+                      }} />
                     ))}
+                    <span style={{ fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", color: strength.color, marginLeft: "6px", whiteSpace: "nowrap" }}>
+                      Password strength: {strength.label}
+                    </span>
                   </div>
-                  <div style={{ fontSize: "9px", letterSpacing: "0.08em", textTransform: "uppercase", color: strength.color, marginTop: "4px" }}>
-                    {strength.label}
-                  </div>
-                </>
-              )}
-              {errors.password && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.password}</div>}
-            </div>
-
-            {/* Role */}
-            <div style={{ marginBottom: "14px" }}>
-              <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
-                Role
-              </label>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "6px" }}>
-                {roles.map((r) => (
-                  <button
-                    key={r} type="button"
-                    className="role-btn"
-                    onClick={() => setSelectedRole(r)}
-                    style={{
-                      background: selectedRole === r ? c.dark : c.inputBg,
-                      border: `1px solid ${selectedRole === r ? c.dark : c.border}`,
-                      borderRadius: "8px", padding: "9px 4px",
-                      fontSize: "11px", fontFamily: "'Jost', sans-serif",
-                      fontWeight: 400, color: selectedRole === r ? c.sand : c.muted,
-                      cursor: "pointer", textAlign: "center", letterSpacing: "0.04em",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    {r.charAt(0).toUpperCase() + r.slice(1)}
-                  </button>
-                ))}
+                )}
+                {errors.password && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.password}</div>}
               </div>
-            </div>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              className="submit-btn"
-              disabled={isSubmitDisabled}
-              style={{
-                width: "100%", padding: "11px", border: "none",
-                borderRadius: "8px", background: c.dark, color: c.sand,
-                fontSize: "11px", fontWeight: 500, fontFamily: "'Jost', sans-serif",
-                letterSpacing: "0.16em", textTransform: "uppercase",
-                cursor: isSubmitDisabled ? "not-allowed" : "pointer",
-                marginTop: "6px", opacity: isSubmitDisabled ? 0.38 : 1,
-                transition: "background 0.2s, opacity 0.2s",
-              }}
-            >
-              {loading ? "Creating..." : "Create Account"}
-            </button>
-          </form>
+              {/* Role */}
+              <div style={{ marginBottom: "18px" }}>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>I am a</label>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px" }}>
+                  {roles.map(r => (
+                    <button key={r} type="button" className="role-btn"
+                      onClick={() => setSelectedRole(r)}
+                      style={{
+                        background: selectedRole === r ? c.dark : c.inputBg,
+                        border: `1px solid ${selectedRole === r ? c.dark : c.border}`,
+                        borderRadius: "8px", padding: "10px 4px",
+                        fontSize: "12px", fontFamily: "'Jost', sans-serif",
+                        fontWeight: 400, color: selectedRole === r ? c.sand : c.muted,
+                        cursor: "pointer", textAlign: "center", letterSpacing: "0.04em",
+                        transition: "all 0.2s",
+                      }}>
+                      {r.charAt(0).toUpperCase() + r.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                {errors.role && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.role}</div>}
+              </div>
 
-          {/* Message */}
-          {message && (
-            <div style={{
-              marginTop: "12px", padding: "10px 12px", borderRadius: "8px",
-              fontSize: "12px", textAlign: "center", fontWeight: 400,
-              background: isError ? "rgba(176,80,48,0.07)" : "rgba(92,112,87,0.08)",
-              color: isError ? c.error : c.success,
-              border: `1px solid ${isError ? "rgba(176,80,48,0.18)" : "rgba(92,112,87,0.2)"}`,
-            }}>
-              {message}
-            </div>
-          )}
+              {/* Submit */}
+              <button type="submit" className="submit-btn" disabled={isSubmitDisabled}
+                style={{
+                  width: "100%", padding: "12px", border: "none", borderRadius: "8px",
+                  background: c.dark, color: c.sand, fontSize: "11px", fontWeight: 500,
+                  fontFamily: "'Jost', sans-serif", letterSpacing: "0.16em", textTransform: "uppercase",
+                  cursor: isSubmitDisabled ? "not-allowed" : "pointer",
+                  opacity: isSubmitDisabled ? 0.38 : 1, transition: "background 0.2s, opacity 0.2s",
+                }}>
+                {loading ? "Creating..." : "Create Account"}
+              </button>
+            </form>
+
+            {message && (
+              <div style={{
+                marginTop: "12px", padding: "10px 12px", borderRadius: "8px",
+                fontSize: "12px", textAlign: "center", fontWeight: 400,
+                background: isError ? "rgba(176,80,48,0.07)" : "rgba(92,112,87,0.08)",
+                color: isError ? c.error : c.success,
+                border: `1px solid ${isError ? "rgba(176,80,48,0.18)" : "rgba(92,112,87,0.2)"}`,
+              }}>{message}</div>
+            )}
+          </div>
 
           {/* Footer */}
-          <p style={{ marginTop: "16px", textAlign: "center", fontSize: "12px", color: c.muted, fontWeight: 300 }}>
-            Already have an account?{" "}
-            <a href="/" style={{ color: c.stone, fontWeight: 500, textDecoration: "none" }}>Sign in</a>
+          <p style={{ textAlign: "center", fontSize: "11px", color: c.muted, fontWeight: 300, marginTop: "24px" }}>
+            © 2026 Swagne. All rights reserved.
           </p>
         </div>
       </div>

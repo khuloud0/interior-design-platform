@@ -1,53 +1,7 @@
- import React, { useState, useEffect } from "react";
- import { useParams, useNavigate } from "react-router-dom";
-
- export function RequestDetailsPage() {
-   const { id } = useParams();
-   const navigate = useNavigate();
-   const [data, setData] = useState(null);
-   const [loading, setLoading] = useState(true);
-
- useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch(`http://127.0.0.1:5000/design-requests/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [id]);
-
-  if (loading) return <div>Loading...</div>;
-  if (!data)   return <div>Request not found.</div>;
-
-  return (
-     <RequestDetails
-       request={data.request}
-      designVision={data.design_vision}
-     offers={data.offers ?? []}
-      clientAttachments={data.attachments ?? []}
-      onEdit={() =>
-       navigate("/create-request", {
-        state: {
-        mode: "edit",
-        request: data.request,
-    },
-  })
-}
-      onSelectOffer={() => navigate(`/requests/${id}/offers`)}
-      onDesignerClick={(name) => navigate(`/designers/${encodeURIComponent(name)}`)}    />
-   );
- }
-
-/**
- * RequestDetails — SWAGNE
- *
- * Route:  /requests/:id
- * Fetch:  GET /design-requests/:id  →  { request, design_vision, offers, attachments }
- *
- * request.status values (from backend):
- *   "pending" | "in_progress" | "execution_plan_ready" | "offers_ready" | "completed"
- */
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ClientSidebar from "../../components/ClientSidebar";
+import CreateRequestModal from "../../components/CreateRequestModal";
 
 const C = {
   dark: "#2C221A", mid: "#3D3128", sand: "#D4C4B0",
@@ -56,12 +10,10 @@ const C = {
   terra: "#7A3B2E", terraL: "#F0E8E4",
   teal: "#1E6B5E", ok: "#4A6645",
 };
-
 const STATUS_STEP = {
   pending: 1, in_progress: 2,
   execution_plan_ready: 3, offers_ready: 4, completed: 5,
 };
-
 const STATUS_META = {
   pending:              { dot: C.sand,  label: "Pending Review" },
   in_progress:          { dot: C.stone, label: "In Progress" },
@@ -69,15 +21,10 @@ const STATUS_META = {
   offers_ready:         { dot: C.ok,    label: "Offers Ready" },
   completed:            { dot: C.ok,    label: "Completed" },
 };
-
 const STEP_LABELS = [
-  "Request submitted",
-  "Designer reviewing",
-  "Execution plan ready",
-  "Providers submit offers",
-  "Confirmed",
+  "Request submitted", "Designer reviewing",
+  "Execution plan ready", "Providers submit offers", "Confirmed",
 ];
-
 const f = { font: "'Jost', sans-serif", serif: "'Cormorant Garamond', serif" };
 const T = {
   label: { fontSize: 9, fontWeight: 500, letterSpacing: "0.18em", textTransform: "uppercase", color: C.muted, fontFamily: f.font },
@@ -85,7 +32,6 @@ const T = {
   muted: { fontSize: 12, fontWeight: 300, color: C.muted, fontFamily: f.font },
 };
 
-// ── Section ───────────────────────────────────────────────────
 const Section = ({ label, children }) => (
   <div style={{ marginBottom: 40 }}>
     {label && (
@@ -98,7 +44,6 @@ const Section = ({ label, children }) => (
   </div>
 );
 
-// ── Logo ──────────────────────────────────────────────────────
 const LogoMark = () => (
   <div style={{ width: 24, height: 24, border: "1.5px solid rgba(212,196,176,0.3)", borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
     <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
@@ -110,7 +55,6 @@ const LogoMark = () => (
   </div>
 );
 
-// ── Stepper ───────────────────────────────────────────────────
 const Stepper = ({ status }) => {
   const cur = STATUS_STEP[status] || 1;
   return (
@@ -130,8 +74,7 @@ const Stepper = ({ status }) => {
               }}>
                 {done
                   ? <svg width="10" height="10" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  : <span>{String(idx).padStart(2, "0")}</span>
-                }
+                  : <span>{String(idx).padStart(2, "0")}</span>}
               </div>
               <span style={{ fontSize: 10, fontFamily: f.font, fontWeight: active ? 500 : 300, color: done ? C.stone : active ? C.terra : C.muted, textAlign: "center", lineHeight: 1.4, maxWidth: 64 }}>
                 {label}
@@ -147,15 +90,6 @@ const Stepper = ({ status }) => {
   );
 };
 
-// ── Summary row ───────────────────────────────────────────────
-const SummaryRow = ({ label, value }) => (
-  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBlock: 14, borderBottom: `0.5px solid ${C.border}` }}>
-    <span style={T.muted}>{label}</span>
-    <span style={T.val}>{value}</span>
-  </div>
-);
-
-// ── Client attachment ─────────────────────────────────────────
 const AttachItem = ({ name, type }) => (
   <div style={{ border: `0.5px solid ${C.border}`, borderRadius: 12, overflow: "hidden", background: C.sec, cursor: "pointer" }}>
     <div style={{ height: 90, background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "rgba(212,196,176,0.2)" }}>
@@ -168,7 +102,6 @@ const AttachItem = ({ name, type }) => (
   </div>
 );
 
-// ── Rec card ──────────────────────────────────────────────────
 const RecCard = ({ title, description }) => (
   <div style={{ background: C.sec, border: `0.5px solid ${C.border}`, borderRadius: 12, padding: "16px 18px" }}>
     <div style={{ fontSize: 13, fontWeight: 500, color: C.dark, fontFamily: f.font, marginBottom: 6 }}>{title}</div>
@@ -176,7 +109,6 @@ const RecCard = ({ title, description }) => (
   </div>
 );
 
-// ── Layout card ───────────────────────────────────────────────
 const layoutPreviews = [
   { bg: "#261C14", svg: <svg viewBox="0 0 120 90" width="95" height="72"><rect x="6" y="6" width="108" height="78" fill="none" stroke="rgba(212,196,176,0.25)" strokeWidth="1.5" /><rect x="14" y="14" width="42" height="32" fill="rgba(212,196,176,0.08)" stroke="rgba(212,196,176,0.2)" strokeWidth="1" rx="1" /><text x="35" y="33" fontSize="6" fill="rgba(212,196,176,0.4)" textAnchor="middle" fontFamily="Jost,sans-serif">BED</text><rect x="62" y="14" width="48" height="38" fill="rgba(212,196,176,0.06)" stroke="rgba(212,196,176,0.15)" strokeWidth="1" rx="1" /></svg> },
   { bg: "#261C14", svg: <svg viewBox="0 0 120 90" width="95" height="72"><line x1="6" y1="74" x2="114" y2="74" stroke="rgba(212,196,176,0.2)" strokeWidth="1" /><rect x="22" y="38" width="46" height="32" fill="rgba(212,196,176,0.08)" stroke="rgba(212,196,176,0.2)" strokeWidth="1" rx="1" /><circle cx="94" cy="26" r="12" fill="rgba(212,196,176,0.06)" stroke="rgba(212,196,176,0.18)" strokeWidth="1" /></svg> },
@@ -200,295 +132,367 @@ const LayoutCard = ({ name, size, index }) => {
   );
 };
 
-// ── Provider row ──────────────────────────────────────────────
-const ProviderRow = ({ offer }) => (
-  <div style={{ display: "flex", alignItems: "center", gap: 16, paddingBlock: 18, borderBottom: `0.5px solid ${C.border}` }}>
-    <div style={{ width: 38, height: 38, borderRadius: 10, background: offer.recommended ? C.dark : C.sec, border: `0.5px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: f.serif, fontSize: 14, color: offer.recommended ? C.sand : C.stone, flexShrink: 0 }}>
-      {offer.provider_initials}
-    </div>
-    <div style={{ flex: 1 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: C.dark, fontFamily: f.font }}>{offer.provider_name}</span>
-        {offer.recommended && (
-          <span style={{ fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: C.teal, background: "rgba(30,107,94,0.08)", border: "0.5px solid rgba(30,107,94,0.2)", borderRadius: 99, padding: "2px 8px", fontFamily: f.font }}>
-            Recommended
-          </span>
-        )}
+// ✅ ProviderRow مع زر Select
+const ProviderRow = ({ offer, onSelect, selecting, selected }) => (
+  <div style={{ paddingBlock: 20, borderBottom: `0.5px solid ${C.border}` }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: offer.recommendation ? 12 : 0 }}>
+      <div style={{ width: 38, height: 38, borderRadius: 10, background: offer.recommended ? C.dark : C.sec, border: `0.5px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: f.serif, fontSize: 14, color: offer.recommended ? C.sand : C.stone, flexShrink: 0 }}>
+        {offer.provider_initials}
       </div>
-      <div style={{ display: "flex", gap: 10, fontSize: 11.5, color: C.muted, fontFamily: f.font, fontWeight: 300 }}>
-        <span>★ {offer.rating}</span>
-        <span>·</span>
-        <span>{offer.duration_days} days</span>
-        <span>·</span>
-        <span>{offer.total_projects} projects</span>
+      <div style={{ flex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: C.dark, fontFamily: f.font }}>{offer.provider_name}</span>
+          {offer.recommended && (
+            <span style={{ fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: C.teal, background: "rgba(30,107,94,0.08)", border: "0.5px solid rgba(30,107,94,0.2)", borderRadius: 99, padding: "2px 8px", fontFamily: f.font }}>Recommended</span>
+          )}
+        </div>
+        <div style={{ fontSize: 11.5, color: C.muted, fontFamily: f.font, fontWeight: 300 }}>
+          {offer.work_type} · {offer.duration_days}
+        </div>
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <div style={{ fontFamily: f.serif, fontSize: 20, color: C.dark }}>
+          {Number(offer.price).toLocaleString()}
+          <span style={{ fontSize: 11, fontFamily: f.font, color: C.muted, marginLeft: 3 }}>SAR</span>
+        </div>
       </div>
     </div>
-    <div style={{ fontFamily: f.serif, fontSize: 20, color: C.dark }}>
-      {offer.price.toLocaleString()}
-      <span style={{ fontSize: 11, fontFamily: f.font, color: C.muted, marginLeft: 3 }}>SAR</span>
-    </div>
+
+    {/* توصية المصمم */}
+    {offer.recommendation && (
+      <div style={{ padding: "10px 14px", background: "rgba(30,107,94,0.06)", border: "0.5px solid rgba(30,107,94,0.15)", borderRadius: 8, marginBottom: 12 }}>
+        <div style={{ fontSize: 9, color: C.teal, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>Designer's Note</div>
+        <div style={{ fontSize: 12, color: C.mid, fontWeight: 300, lineHeight: 1.6 }}>{offer.recommendation}</div>
+      </div>
+    )}
+
+    {/* ✅ زر Select */}
+    {!selected && (
+      <button
+        onClick={() => onSelect(offer.id)}
+        disabled={selecting}
+        style={{ width: "100%", padding: "10px", borderRadius: 10, border: `0.5px solid ${C.border}`, background: "transparent", color: C.stone, fontSize: 10, fontWeight: 500, fontFamily: f.font, letterSpacing: ".12em", textTransform: "uppercase", cursor: selecting ? "not-allowed" : "pointer", transition: "all .15s" }}
+        onMouseEnter={e => { if (!selecting) { e.currentTarget.style.background = C.dark; e.currentTarget.style.color = C.sand; e.currentTarget.style.borderColor = C.dark; } }}
+        onMouseLeave={e => { if (!selecting) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = C.stone; e.currentTarget.style.borderColor = C.border; } }}
+      >
+        {selecting ? "Processing..." : "Select This Offer →"}
+      </button>
+    )}
+
+    {selected && (
+      <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(74,102,69,0.08)", border: "0.5px solid rgba(74,102,69,0.2)", fontSize: 12, color: C.ok, display: "flex", alignItems: "center", gap: 8 }}>
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        You selected this offer — project is now active.
+      </div>
+    )}
   </div>
 );
 
-// ── Ghost button style ────────────────────────────────────────
-const ghostBtn = {
-  display: "flex", alignItems: "center", gap: 6,
-  padding: "7px 16px", borderRadius: 8,
-  border: `0.5px solid ${C.border}`, background: "transparent",
-  color: C.stone, fontSize: 11, fontFamily: f.font,
-  fontWeight: 400, letterSpacing: "0.06em", cursor: "pointer",
-  transition: "border-color .15s, color .15s",
-};
+const GhostBtn = ({ onClick, children }) => (
+  <button onClick={onClick} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 16px", borderRadius: 8, border: `0.5px solid ${C.border}`, background: "transparent", color: C.stone, fontSize: 11, fontFamily: f.font, fontWeight: 400, letterSpacing: "0.06em", cursor: "pointer" }}>
+    {children}
+  </button>
+);
 
-// ── Main component ────────────────────────────────────────────
-export default function RequestDetails({
-  request = {},
-  designVision = null,
-  offers = [],
-  clientAttachments = [],
-  onEdit,
-  onSelectOffer,
-  onDesignerClick,
-}) {
-  const { id } = useParams();   // /requests/:id
-  const navigate = useNavigate();
-
+function RequestDetails({ request = {}, designVision = null, offers = [], clientAttachments = [], onEdit, onDesignerClick, onSelectOffer, selectingOffer, selectedOfferId }) {
   const {
     title = "—", service_type, space_type, preferred_style,
     preferred_colors, budget, space_details, submitted_at, status = "pending",
+    space_size, desired_start, duration,
   } = request;
 
-  const meta     = STATUS_META[status] || STATUS_META.pending;
+  const meta      = STATUS_META[status] || STATUS_META.pending;
   const isPending = status === "pending";
-  const hasDV    = ["execution_plan_ready", "offers_ready", "completed"].includes(status) && designVision;
-  const hasOffers = status === "offers_ready" && offers.length > 0;
+  const hasDV     = ["execution_plan_ready", "offers_ready", "completed"].includes(status) && designVision;
+  const hasOffers = ["offers_ready", "completed"].includes(status) && offers.length > 0;
 
   const submitted = submitted_at
     ? new Date(submitted_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
     : "";
 
+  const [initials, setInitials] = useState("?");
+  useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("user") || "{}");
+      setInitials(u?.name?.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() || "?");
+    } catch {}
+  }, []);
+
   return (
-    <>
-      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-      <div style={{ background: C.bg, minHeight: "100vh", fontFamily: f.font }}>
-        <div style={{ maxWidth: 640, margin: "0 auto", padding: "32px 24px 80px" }}>
+    <div style={{ display: "flex", height: "100vh", fontFamily: f.font, background: C.bg }}>
+      <ClientSidebar variant="light" />
+      <main style={{ flex: 1, overflowY: "auto", padding: "32px 40px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+          <div style={{ fontSize: 9, fontWeight: 500, letterSpacing: "0.16em", color: C.muted, textTransform: "uppercase" }}>DESIGNER MARKETPLACE</div>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: f.serif, fontSize: 14, fontWeight: 600, color: C.sand }}>{initials}</div>
+        </div>
 
-          {/* ── BACK / HOME ── */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
-            <button style={ghostBtn} onClick={() => navigate(-1)}>← Back</button>
-            <button style={ghostBtn} onClick={() => navigate("/")}>Home</button>
+        <h1 style={{ fontFamily: f.serif, fontSize: 32, fontWeight: 400, color: C.dark, marginBottom: 6 }}>Request Details</h1>
+        <p style={{ fontSize: 12, color: C.muted, fontWeight: 300, marginBottom: 28, lineHeight: 1.7 }}>Track the status of your design request and review updates from your designer.</p>
+        <div style={{ marginBottom: 32 }}><GhostBtn onClick={onEdit}>✎ Edit Request</GhostBtn></div>
+
+        {/* Hero card */}
+        <div style={{ background: C.dark, borderRadius: 20, overflow: "hidden", marginBottom: 32, position: "relative" }}>
+          <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 28px,#D4C4B0 28px,#D4C4B0 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,#D4C4B0 28px,#D4C4B0 29px)" }} />
+          <div style={{ position: "relative", zIndex: 1, padding: "28px 32px 32px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <LogoMark />
+                <span style={{ fontFamily: f.serif, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", color: C.sand, textTransform: "uppercase" }}>Swagne</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 99, border: "1px solid rgba(212,196,176,0.2)" }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: meta.dot }} />
+                <span style={{ fontSize: 10, letterSpacing: "0.1em", color: "rgba(212,196,176,0.6)", textTransform: "uppercase", fontFamily: f.font }}>{meta.label}</span>
+              </div>
+            </div>
+            <div style={{ fontFamily: f.serif, fontSize: 32, fontWeight: 300, color: "#fff", marginBottom: 8, lineHeight: 1.15 }}>{title}</div>
+            <div style={{ fontSize: 12, color: "rgba(212,196,176,0.45)", fontWeight: 300, marginBottom: 28 }}>{submitted && `Submitted ${submitted}`}</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {[service_type, space_type, budget && `${Number(budget).toLocaleString()} SAR`].filter(Boolean).map((v, i) => (
+                <div key={i} style={{ padding: "5px 12px", borderRadius: 99, background: "rgba(212,196,176,0.07)", border: "0.5px solid rgba(212,196,176,0.12)", fontSize: 11.5, color: "rgba(212,196,176,0.6)", fontFamily: f.font, fontWeight: 300 }}>{v}</div>
+              ))}
+            </div>
           </div>
+        </div>
 
-          {/* ── HERO ── */}
-          <div style={{ background: C.dark, borderRadius: 20, overflow: "hidden", marginBottom: 32, position: "relative" }}>
-            <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 28px,#D4C4B0 28px,#D4C4B0 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,#D4C4B0 28px,#D4C4B0 29px)" }} />
-            <div style={{ position: "relative", zIndex: 1, padding: "28px 32px 32px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <LogoMark />
-                  <span style={{ fontFamily: f.serif, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", color: C.sand, textTransform: "uppercase" }}>Swagne</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {isPending && (
-                    <button
-                      onClick={onEdit}
-                      style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(212,196,176,0.25)", background: "transparent", color: "rgba(212,196,176,0.75)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: f.font, cursor: "pointer" }}
-                    >
-                      ✎ Edit Request
-                    </button>
-                  )}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 99, border: "1px solid rgba(212,196,176,0.2)" }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: meta.dot }} />
-                    <span style={{ fontSize: 10, letterSpacing: "0.1em", color: "rgba(212,196,176,0.6)", textTransform: "uppercase", fontFamily: f.font }}>{meta.label}</span>
-                  </div>
-                </div>
-              </div>
-              <div style={{ fontFamily: f.serif, fontSize: 32, fontWeight: 300, color: "#fff", marginBottom: 8, lineHeight: 1.15 }}>{title}</div>
-              <div style={{ fontSize: 12, color: "rgba(212,196,176,0.45)", fontWeight: 300, marginBottom: 28 }}>
-                {submitted && `Submitted ${submitted}`}
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {[service_type, space_type, budget && `${budget.toLocaleString()} SAR`].filter(Boolean).map((v, i) => (
-                  <div key={i} style={{ padding: "5px 12px", borderRadius: 99, background: "rgba(212,196,176,0.07)", border: "0.5px solid rgba(212,196,176,0.12)", fontSize: 11.5, color: "rgba(212,196,176,0.6)", fontFamily: f.font, fontWeight: 300 }}>
-                    {v}
+        {isPending && (
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 18px", background: C.terraL, border: "0.5px solid rgba(122,59,46,0.18)", borderRadius: 14, marginBottom: 32, fontSize: 12.5, color: C.terra, fontWeight: 300, lineHeight: 1.6 }}>
+            <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>ⓘ</span>
+            You can still edit your request before a designer is assigned.
+          </div>
+        )}
+
+        <Section label="Progress">
+          <div style={{ padding: "28px 24px", background: "#EDE5DC", borderRadius: 16, border: `0.5px solid ${C.border}` }}>
+            <Stepper status={status} />
+          </div>
+        </Section>
+
+        <Section label="Request details">
+          <div style={{ background: "#EDE5DC", borderRadius: 16, border: `0.5px solid ${C.border}`, overflow: "hidden" }}>
+            {[
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/></svg>, label: "SERVICE TYPE", value: service_type },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>, label: "SPACE TYPE", value: space_type },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>, label: "PREFERRED STYLE", value: preferred_style },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>, label: "COLOR PREFERENCE", value: preferred_colors },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>, label: "BUDGET", value: budget ? `${Number(budget).toLocaleString()} SAR` : "—" },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>, label: "SPACE SIZE", value: space_size ? `${space_size} m²` : "—" },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>, label: "DESIRED START", value: desired_start || "—" },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, label: "DURATION", value: duration || "—" },
+            ].reduce((rows, item, i, arr) => {
+              if (i % 2 === 0) rows.push(arr.slice(i, i + 2));
+              return rows;
+            }, []).map((pair, rowIdx, allRows) => (
+              <div key={rowIdx} style={{ display: "grid", gridTemplateColumns: pair.length === 2 ? "1fr 1fr" : "1fr", borderBottom: rowIdx < allRows.length - 1 ? `0.5px solid ${C.border}` : "none" }}>
+                {pair.map((item, colIdx) => (
+                  <div key={colIdx} style={{ padding: "22px 24px", borderRight: colIdx === 0 && pair.length === 2 ? `0.5px solid ${C.border}` : "none", display: "flex", alignItems: "flex-start", gap: 14 }}>
+                    <div style={{ color: C.stone, flexShrink: 0, marginTop: 2 }}>{item.icon}</div>
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 500, letterSpacing: "0.16em", color: C.muted, textTransform: "uppercase", fontFamily: f.font, marginBottom: 6 }}>{item.label}</div>
+                      <div style={{ fontSize: 14, fontWeight: 400, color: C.dark, fontFamily: f.font }}>{item.value || "—"}</div>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+            ))}
           </div>
+        </Section>
 
-          {/* ── HELPER (pending only) ── */}
-          {isPending && (
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 18px", background: C.terraL, border: "0.5px solid rgba(122,59,46,0.18)", borderRadius: 14, marginBottom: 32, fontSize: 12.5, color: C.terra, fontWeight: 300, lineHeight: 1.6 }}>
-              <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>ⓘ</span>
-              You can still edit your request before a designer is assigned.
-            </div>
-          )}
-
-          {/* ── PROGRESS ── */}
-          <Section label="Progress">
-            <div style={{ padding: "28px 24px", background: "#fff", borderRadius: 16, border: `0.5px solid ${C.border}` }}>
-              <Stepper status={status} />
-            </div>
-          </Section>
-
-          {/* ── REQUEST DETAILS ── */}
-          <Section label="Request details">
-            <div style={{ background: "#fff", borderRadius: 16, border: `0.5px solid ${C.border}`, padding: "0 24px" }}>
-              <SummaryRow label="Service type"     value={service_type} />
-              <SummaryRow label="Space type"       value={space_type} />
-              <SummaryRow label="Preferred style"  value={preferred_style} />
-              <SummaryRow label="Preferred colors" value={preferred_colors} />
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBlock: 14 }}>
-                <span style={T.muted}>Budget</span>
-                <span style={{ fontFamily: f.serif, fontSize: 22, fontWeight: 400, color: C.dark }}>
-                  {budget?.toLocaleString()} <span style={{ fontSize: 12, fontFamily: f.font, color: C.muted }}>SAR</span>
-                </span>
-              </div>
-            </div>
-          </Section>
-
-          {/* ── SPACE DESCRIPTION ── */}
+        {space_details && (
           <Section label="Space description">
-            <div style={{ padding: "24px 28px", background: "#fff", borderRadius: 16, border: `0.5px solid ${C.border}` }}>
-              <p style={{ fontFamily: f.serif, fontSize: 16, fontWeight: 300, fontStyle: "italic", color: C.mid, lineHeight: 1.9, margin: 0 }}>
-                "{space_details}"
-              </p>
+            <div style={{ padding: "24px 28px", background: "#EDE5DC", borderRadius: 16, border: `0.5px solid ${C.border}` }}>
+              <p style={{ fontFamily: f.serif, fontSize: 16, fontWeight: 300, fontStyle: "italic", color: C.mid, lineHeight: 1.9, margin: 0 }}>"{space_details}"</p>
             </div>
           </Section>
+        )}
 
-          {/* ── ATTACHMENTS ── */}
-          {clientAttachments?.length > 0 && (
-            <Section label="Attachments">
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {clientAttachments.map((a, i) => <AttachItem key={i} {...a} />)}
-              </div>
-            </Section>
-          )}
+        {clientAttachments?.length > 0 && (
+          <Section label="Attachments">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {clientAttachments.map((a, i) => <AttachItem key={i} {...a} />)}
+            </div>
+          </Section>
+        )}
 
-          {/* ── DESIGN VISION ── */}
-          {hasDV && (
-            <Section label="Design Vision">
-              <div style={{ background: "#fff", borderRadius: 16, border: `0.5px solid ${C.border}`, overflow: "hidden" }}>
-                <div style={{ background: C.dark, padding: "20px 24px", display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(212,196,176,0.1)", border: "0.5px solid rgba(212,196,176,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: f.serif, fontSize: 15, color: C.sand, flexShrink: 0 }}>
-                    {designVision.designer?.initials}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <button onClick={() => onDesignerClick?.(designVision.designer?.name)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: f.font, fontSize: 13, fontWeight: 500, color: C.sand, borderBottom: "1px solid rgba(212,196,176,0.25)", paddingBottom: 1 }}>
-                      {designVision.designer?.name}
-                    </button>
-                    <div style={{ fontSize: 11, color: "rgba(212,196,176,0.45)", fontWeight: 300, marginTop: 3 }}>
-                      {designVision.designer?.role} · {designVision.designer?.city}
-                    </div>
-                  </div>
-                  <span style={{ fontSize: 11, color: "rgba(212,196,176,0.5)", fontFamily: f.font }}>★ {designVision.designer?.rating}</span>
+        {hasDV && (
+          <Section label="Design Vision">
+            <div style={{ background: "#EDE5DC", borderRadius: 16, border: `0.5px solid ${C.border}`, overflow: "hidden" }}>
+              <div style={{ background: C.dark, padding: "20px 24px", display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(212,196,176,0.1)", border: "0.5px solid rgba(212,196,176,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: f.serif, fontSize: 15, color: C.sand, flexShrink: 0 }}>
+                  {designVision.designer?.initials}
                 </div>
-
-                <div style={{ padding: "28px 24px" }}>
-                  {designVision.palette?.length > 0 && (
-                    <div style={{ marginBottom: 32 }}>
-                      <div style={{ ...T.label, marginBottom: 14 }}>Suggested palette</div>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        {designVision.palette.map((p, i) => (
-                          <div key={i} title={p.name} style={{ width: 28, height: 28, borderRadius: 8, background: p.hex, border: `0.5px solid ${C.border}` }} />
-                        ))}
-                        <span style={{ fontSize: 11, color: C.muted, fontWeight: 300, marginLeft: 8 }}>
-                          {designVision.palette.map(p => p.name).join(" · ")}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {designVision.recommendations?.length > 0 && (
-                    <div style={{ marginBottom: 32 }}>
-                      <div style={{ ...T.label, marginBottom: 14 }}>Recommendations</div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                        {designVision.recommendations.map((r, i) => <RecCard key={i} {...r} />)}
-                      </div>
-                    </div>
-                  )}
-
-                  {designVision.timeline && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: C.sec, border: `0.5px solid ${C.border}`, borderRadius: 12, marginBottom: 32 }}>
-                      <span style={{ fontSize: 12, color: C.stone, fontFamily: f.font }}>Estimated execution timeline</span>
-                      <span style={{ fontFamily: f.serif, fontSize: 18, color: C.dark, marginLeft: "auto" }}>
-                        {designVision.timeline.min} – {designVision.timeline.max} weeks
-                      </span>
-                    </div>
-                  )}
-
-                  {designVision.attachments?.length > 0 && (
-                    <>
-                      <div style={{ ...T.label, marginBottom: 14 }}>Space layouts</div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                        {designVision.attachments.map((a, i) => <LayoutCard key={i} name={a.name} size={a.size} index={i} />)}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </Section>
-          )}
-
-          {/* ── OFFERS (offers_ready only) ── */}
-          {hasOffers && (
-            <Section label="Provider offers">
-              <div style={{ background: "#fff", borderRadius: 16, border: `0.5px solid ${C.border}`, overflow: "hidden" }}>
-                <div style={{ padding: "0 24px" }}>
-                  {offers.map(o => <ProviderRow key={o.id} offer={o} />)}
-                </div>
-                <div style={{ padding: "20px 24px 24px" }}>
-                  <button onClick={onSelectOffer} style={{ width: "100%", padding: 14, border: "none", borderRadius: 12, background: C.dark, color: C.sand, fontSize: 10.5, fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: f.font, cursor: "pointer" }}>
-                    Review & select offer →
+                <div style={{ flex: 1 }}>
+                  <button onClick={() => onDesignerClick?.(designVision.designer?.name)} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: f.font, fontSize: 13, fontWeight: 500, color: C.sand, borderBottom: "1px solid rgba(212,196,176,0.25)", paddingBottom: 1 }}>
+                    {designVision.designer?.name}
                   </button>
+                  <div style={{ fontSize: 11, color: "rgba(212,196,176,0.45)", fontWeight: 300, marginTop: 3 }}>{designVision.designer?.role} · {designVision.designer?.city}</div>
                 </div>
               </div>
-            </Section>
-          )}
+              <div style={{ padding: "28px 24px" }}>
+                {/* Vision */}
+                {designVision.vision && (
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ ...T.label, marginBottom: 10 }}>Design Vision</div>
+                    <p style={{ fontSize: 13, color: C.mid, fontWeight: 300, lineHeight: 1.8 }}>{designVision.vision}</p>
+                  </div>
+                )}
+                {/* Materials & Colors */}
+                {(designVision.materials || designVision.colors) && (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
+                    {designVision.materials && (
+                      <div>
+                        <div style={{ ...T.label, marginBottom: 6 }}>Materials</div>
+                        <div style={{ fontSize: 13, color: C.dark }}>{designVision.materials}</div>
+                      </div>
+                    )}
+                    {designVision.colors && (
+                      <div>
+                        <div style={{ ...T.label, marginBottom: 6 }}>Color Palette</div>
+                        <div style={{ fontSize: 13, color: C.dark }}>{designVision.colors}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* Stages */}
+                {designVision.stages?.length > 0 && (
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ ...T.label, marginBottom: 12 }}>Project Stages</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {designVision.stages.map((s, i) => (
+                        <div key={i} style={{ padding: "12px 16px", background: C.sec, borderRadius: 10, border: `0.5px solid ${C.border}` }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                            <span style={{ fontSize: 12, fontWeight: 500, color: C.dark }}>{s.title}</span>
+                            {s.duration && <span style={{ fontSize: 11, color: C.muted }}>{s.duration}</span>}
+                          </div>
+                          {s.description && <p style={{ fontSize: 11, color: C.muted, margin: 0, lineHeight: 1.6 }}>{s.description}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {designVision.estimated_budget && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: C.sec, border: `0.5px solid ${C.border}`, borderRadius: 12 }}>
+                    <span style={{ fontSize: 12, color: C.stone, fontFamily: f.font }}>Estimated execution budget</span>
+                    <span style={{ fontFamily: f.serif, fontSize: 18, color: C.dark, marginLeft: "auto" }}>{Number(designVision.estimated_budget).toLocaleString()} SAR</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Section>
+        )}
 
-        </div>
-      </div>
+        {/* ✅ قسم عروض المقاولين مع زر Select لكل عرض */}
+        {hasOffers && (
+          <Section label="Provider Offers">
+            <div style={{ background: "#EDE5DC", borderRadius: 16, border: `0.5px solid ${C.border}`, overflow: "hidden" }}>
+              <div style={{ padding: "8px 24px 0" }}>
+                {offers.map(o => (
+                  <ProviderRow
+                    key={o.id}
+                    offer={o}
+                    onSelect={onSelectOffer}
+                    selecting={selectingOffer}
+                    selected={selectedOfferId === o.id}
+                  />
+                ))}
+              </div>
+              {selectedOfferId && (
+                <div style={{ padding: "16px 24px 24px", fontSize: 12, color: C.ok, fontWeight: 300 }}>
+                  ✓ Your selection has been confirmed. The other offers have been cancelled.
+                </div>
+              )}
+            </div>
+          </Section>
+        )}
+
+      </main>
+    </div>
+  );
+}
+
+export function RequestDetailsPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [data, setData]         = useState(null);
+  const [loading, setLoading]   = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectingOffer, setSelectingOffer] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
+
+  const fetchData = () => {
+    const token = localStorage.getItem("token");
+    fetch(`http://127.0.0.1:5000/design-requests/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchData(); }, [id]);
+
+  // ✅ العميل يختار عرض
+  const handleSelectOffer = async (offerId) => {
+    setSelectingOffer(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/select-offer`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ offer_id: offerId }),
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        setSelectedOfferId(offerId);
+        fetchData(); // تحديث الصفحة
+      }
+    } catch {}
+    finally { setSelectingOffer(false); }
+  };
+
+  if (loading) return (
+    <div style={{ display: "flex", height: "100vh", fontFamily: "'Jost', sans-serif", background: "#F5F0EA" }}>
+      <ClientSidebar variant="light" />
+      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontSize: 12, color: "#B0A090", letterSpacing: "0.1em" }}>Loading...</div>
+      </main>
+    </div>
+  );
+
+  if (!data) return (
+    <div style={{ display: "flex", height: "100vh", fontFamily: "'Jost', sans-serif", background: "#F5F0EA" }}>
+      <ClientSidebar variant="light" />
+      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontSize: 12, color: "#B0A090" }}>Request not found.</div>
+      </main>
+    </div>
+  );
+
+  return (
+    <>
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } body { margin: 0; }`}</style>
+      <CreateRequestModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        onSuccess={() => { setEditOpen(false); fetchData(); }}
+        initialData={data.request}
+        mode="edit"
+        requestId={id}
+      />
+      <RequestDetails
+        request={data.request}
+        designVision={data.design_vision}
+        offers={data.offers ?? []}
+        clientAttachments={data.attachments ?? []}
+        onEdit={() => setEditOpen(true)}
+        onSelectOffer={handleSelectOffer}
+        selectingOffer={selectingOffer}
+        selectedOfferId={selectedOfferId}
+        onDesignerClick={(name) => navigate(`/designers/${encodeURIComponent(name)}`)}
+      />
     </>
   );
 }
 
-// ── Page wrapper — fetches by :id from URL ─────────────────────
-//
-// import { useState, useEffect } from "react";
-// import { useParams, useNavigate } from "react-router-dom";
-//
-// export function RequestDetailsPage() {
-//   const { id } = useParams();
-//   const navigate = useNavigate();
-//   const [data, setData] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-//     fetch(`http://127.0.0.1:5000/design-requests/${id}`, {
-//       headers: { Authorization: `Bearer ${token}` },
-//     })
-//       .then(r => r.json())
-//       .then(d => { setData(d); setLoading(false); })
-//       .catch(() => setLoading(false));
-//   }, [id]);
-//
-//   if (loading) return <div>Loading...</div>;
-//   if (!data)   return <div>Request not found.</div>;
-//
-//   return (
-//     <RequestDetails
-//       request={data.request}
-//       designVision={data.design_vision}
-//       offers={data.offers ?? []}
-//       clientAttachments={data.attachments ?? []}
-//       onEdit={() => navigate(`/requests/${id}/edit`)}
-//       onSelectOffer={() => navigate(`/requests/${id}/offers`)}
-//       onDesignerClick={(name) => navigate(`/designers/${encodeURIComponent(name)}`)}
-//     />
-//   );
-// }
-//
-// ── Router ────────────────────────────────────────────────────
-// <Route path="/requests/:id" element={<RequestDetailsPage />} />
+export default RequestDetailsPage;
