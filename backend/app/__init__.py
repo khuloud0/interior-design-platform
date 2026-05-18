@@ -49,6 +49,7 @@ def create_app():
     from app.routes.step_routes import step_bp
     from app.routes.offer_routes import offer_bp
     from app.routes.selected_offer_routes import selected_offer_bp
+    from app.routes.project_routes import project_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(design_request_bp)
@@ -57,5 +58,6 @@ def create_app():
     app.register_blueprint(step_bp)
     app.register_blueprint(offer_bp)
     app.register_blueprint(selected_offer_bp)
-    
+    app.register_blueprint(project_bp)    
+
     return app
