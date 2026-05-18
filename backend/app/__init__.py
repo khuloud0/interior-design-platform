@@ -36,6 +36,7 @@ def create_app():
         ExecutionStep,
         Offer,
         SelectedOffer,
+        Project,
         DesignRequestAttachment,
     )
 

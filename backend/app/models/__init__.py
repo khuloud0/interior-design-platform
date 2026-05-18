@@ -7,3 +7,4 @@ from app.models.execution_plan import ExecutionPlan
 from app.models.execution_step import ExecutionStep
 from app.models.offer import Offer
 from app.models.selected_offer import SelectedOffer
+from app.models.project import Project
