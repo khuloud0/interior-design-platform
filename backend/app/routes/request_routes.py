@@ -21,7 +21,7 @@ from app.services.plan_service import (
     respond_to_offer,
     get_contractor_responses,
     send_to_client,
-    select_offer,
+    select_offer,  # ✅
 )
 
 design_request_bp = Blueprint("design_request_bp", __name__)
@@ -139,7 +139,7 @@ def client_select_offer(request_id):
 @design_request_bp.route("/contractor-offers", methods=["GET"])
 def list_contractor_offers():
     provider_id = request.args.get("provider_id", type=int)
-    status      = request.args.get("status")
+    status = request.args.get("status")
     response, status_code = get_all_contractor_offers(provider_id, status)
     return jsonify(response), status_code
 
