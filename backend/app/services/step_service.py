@@ -1,7 +1,8 @@
 from app import db
 from app.models.execution_step import ExecutionStep
 from app.models.execution_plan import ExecutionPlan
-
+from app.models.selected_offer import SelectedOffer
+from app.models.offer import Offer
 
 def create_execution_step(data, designer_id):
     required_fields = [
@@ -49,3 +50,37 @@ def create_execution_step(data, designer_id):
         "message": "Execution step created successfully",
         "step_id": execution_step.id
     }, 201
+
+def update_execution_step_status(step_id, data, provider_id):
+    allowed_statuses = ["pending", "in_progress", "completed"]
+
+    if "status" not in data or data["status"] in [None, ""]:
+        return {"error": "All required fields must be provided"}, 400
+
+    if data["status"] not in allowed_statuses:
+        return {"error": "Invalid status value"}, 400
+
+    execution_step = ExecutionStep.query.get(step_id)
+
+    if not execution_step:
+        return {"error": "Step not found"}, 404
+
+    selected_offer = SelectedOffer.query.filter_by(
+        step_id=step_id
+    ).first()
+
+    if not selected_offer:
+        return {"error": "Forbidden"}, 403
+
+    offer = Offer.query.get(selected_offer.offer_id)
+
+    if not offer or offer.provider_id != provider_id:
+        return {"error": "Forbidden"}, 403
+
+    execution_step.status = data["status"]
+    db.session.commit()
+
+    return {
+        "message": "Status updated successfully"
+    }, 200
+

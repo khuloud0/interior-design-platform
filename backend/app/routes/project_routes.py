@@ -4,6 +4,7 @@ from app.services.project_service import (
     confirm_full_package,
     create_project,
     get_project_overview,
+    update_project_status,
 )
 
 
@@ -52,6 +53,23 @@ def get_project(project_id):
 
     response, status_code = get_project_overview(
         project_id,
+        user_id,
+        role
+    )
+
+    return jsonify(response), status_code
+@project_bp.route("/projects/<int:project_id>", methods=["PATCH"])
+@jwt_required()
+def update_project(project_id):
+    claims = get_jwt()
+
+    user_id = claims.get("user_id")
+    role = claims.get("role")
+
+    data = request.get_json()
+    response, status_code = update_project_status(
+        project_id,
+        data,
         user_id,
         role
     )

@@ -164,3 +164,32 @@ def get_project_overview(project_id, user_id, role):
         "status": project.status,
         "steps": steps_data,
     }, 200
+
+def update_project_status(project_id, data, user_id, role):
+    allowed_statuses = ["pending", "in_progress", "completed"]
+
+    if "status" not in data or data["status"] in [None, ""]:
+        return {"error": "All required fields must be provided"}, 400
+
+    if data["status"] not in allowed_statuses:
+        return {"error": "Invalid status value"}, 400
+
+    project = Project.query.get(project_id)
+
+    if not project:
+        return {"error": "Project not found"}, 404
+
+    if role != "client":
+        return {"error": "Forbidden"}, 403
+
+    if project.homeowner_id != user_id:
+        return {"error": "Forbidden"}, 403
+
+    project.status = data["status"]
+    db.session.commit()
+
+    return {
+        "message": "Status updated successfully"
+    }, 200
+
+
