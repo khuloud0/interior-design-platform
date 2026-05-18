@@ -1,9 +1,11 @@
+from app import db
 from app.models.design_request import DesignRequest
 from app.models.execution_plan import ExecutionPlan
 from app.models.execution_step import ExecutionStep
 from app.models.selected_offer import SelectedOffer
-from app import db
 from app.models.project import Project
+from app.models.offer import Offer
+
 
 def confirm_full_package(data, homeowner_id):
     if "request_id" not in data or data["request_id"] in [None, ""]:
@@ -100,3 +102,65 @@ def create_project(data, homeowner_id):
         "message": "Project created successfully",
         "project_id": project.id
     }, 201
+
+
+def get_project_overview(project_id, user_id, role):
+    project = Project.query.get(project_id)
+
+    if not project:
+        return {"error": "Project not found"}, 404
+
+    # Only the homeowner/client who owns this project can view it
+    if role != "client":
+        return {"error": "Forbidden"}, 403
+
+    if project.homeowner_id != user_id:
+        return {"error": "Forbidden"}, 403
+
+    execution_plan = ExecutionPlan.query.filter_by(
+        request_id=project.request_id
+    ).first()
+
+    steps_data = []
+
+    if execution_plan:
+        execution_steps = ExecutionStep.query.filter_by(
+            plan_id=execution_plan.id
+        ).order_by(ExecutionStep.step_order.asc()).all()
+
+        for step in execution_steps:
+            selected_offer = SelectedOffer.query.filter_by(
+                step_id=step.id
+            ).first()
+
+            selected_offer_data = None
+
+            if selected_offer:
+                offer = Offer.query.get(selected_offer.offer_id)
+
+                if offer:
+                    selected_offer_data = {
+                        "offer_id": offer.id,
+                        "provider": {
+                            "id": offer.provider.id if offer.provider else None,
+                            "name": offer.provider.name if offer.provider else None,
+                        },
+                        "price": offer.price,
+                        "duration": offer.duration,
+                        "notes": offer.notes,
+                    }
+
+            steps_data.append({
+                "step_id": step.id,
+                "description": step.description,
+                "status": step.status,
+                "selected_offer": selected_offer_data,
+            })
+
+    return {
+        "project_id": project.id,
+        "request_id": project.request_id,
+        "homeowner_id": project.homeowner_id,
+        "status": project.status,
+        "steps": steps_data,
+    }, 200
