@@ -1,24 +1,24 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login                   from "./pages/auth/Login";
-import Signup                  from "./pages/auth/Signup";
-import Home                    from "./pages/Home";
-import HomeownerDashboard      from "./pages/homeowner/HomeownerDashboard";
-import CreateRequest           from "./pages/homeowner/CreateRequest";
-import { RequestDetailsPage }  from "./pages/homeowner/RequestDetails";
-import ExploreDesigners        from "./pages/designer/ExploreDesigners";
-import DesignerProfile         from "./pages/designer/DesignerProfile";
-import DesignerRequests        from "./pages/designer/DesignerRequestsDashboard";
-import DesignerRequestDetails  from "./pages/designer/DesignerRequestDetails";
-import MyProfile               from "./pages/designer/MyProfile";
-import CreatePlan              from "./pages/designer/CreatePlan";
-import ManageRequests          from "./pages/designer/ManageRequests";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
+import Home from "./pages/Home";
+import HomeownerDashboard from "./pages/homeowner/HomeownerDashboard";
+import CreateRequest from "./pages/homeowner/CreateRequest";
+import { RequestDetailsPage } from "./pages/homeowner/RequestDetails";
+import ExploreDesigners from "./pages/designer/ExploreDesigners";
+import DesignerProfile from "./pages/designer/DesignerProfile";
+import DesignerRequests from "./pages/designer/DesignerRequestsDashboard";
+import DesignerRequestDetails from "./pages/designer/DesignerRequestDetails";
+import MyProfile from "./pages/designer/MyProfile";
+import CreatePlan from "./pages/designer/CreatePlan";
+import ManageRequests from "./pages/designer/ManageRequests";
 import ProviderAvailableOffers from "./pages/provider/ProviderAvailableOffers";
-import ProviderOfferDetails    from "./pages/provider/ProviderOfferDetails";
-import ProviderMyProjects      from "./pages/provider/ProviderMyProjects";
-import ProviderSettings        from "./pages/provider/ProviderSettings";
-import ClientSettings          from "./pages/homeowner/ClientSettings";
-import DesignerSettings        from "./pages/designer/DesignerSettings";
+import ProviderOfferDetails from "./pages/provider/ProviderOfferDetails";
+import ProviderMyProjects from "./pages/provider/ProviderMyProjects";
+import ProviderSettings from "./pages/provider/ProviderSettings";
+import ClientSettings from "./pages/homeowner/ClientSettings";
+import DesignerSettings from "./pages/designer/DesignerSettings";
 
 const ClientRoute = ({ children }) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -45,26 +45,28 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login"           element={<Login />} />
-        <Route path="/signup"          element={<Signup />} />
-        <Route path="/"                element={<Home />} />
-        <Route path="/designers"       element={<ExploreDesigners />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/designers" element={<ExploreDesigners />} />
         <Route path="/designers/:slug" element={<DesignerProfile />} />
 
         {/* Designer routes */}
-        <Route path="/designer/dashboard"    element={<DesignerRoute><DesignerRequests /></DesignerRoute>} />
-        <Route path="/designer/requests"     element={<DesignerRoute><DesignerRequests /></DesignerRoute>} />
+        <Route path="/designer/dashboard" element={<DesignerRoute><DesignerRequests /></DesignerRoute>} />
+        <Route path="/designer/requests" element={<DesignerRoute><DesignerRequests /></DesignerRoute>} />
         <Route path="/designer/requests/:id" element={<DesignerRoute><DesignerRequestDetails /></DesignerRoute>} />
-        <Route path="/designer/MyProfile"    element={<DesignerRoute><MyProfile /></DesignerRoute>} />
+        <Route path="/designer/MyProfile" element={<DesignerRoute><MyProfile /></DesignerRoute>} />
+        <Route path="/designer/profile" element={<DesignerRoute><MyProfile /></DesignerRoute>} />
         <Route path="/designer/requests/:id/create-plan" element={<DesignerRoute><CreatePlan /></DesignerRoute>} />
-        <Route path="/designer/manage"       element={<DesignerRoute><ManageRequests /></DesignerRoute>} />
-        <Route path="/designer/settings"     element={<DesignerRoute><DesignerSettings /></DesignerRoute>} />
+        <Route path="/designer/manage" element={<DesignerRoute><ManageRequests /></DesignerRoute>} />
+        <Route path="/designer/offers" element={<DesignerRoute><ManageRequests /></DesignerRoute>} />
+        <Route path="/designer/settings" element={<DesignerRoute><DesignerSettings /></DesignerRoute>} />
 
         {/* Client routes */}
-        <Route path="/dashboard"      element={<ClientRoute><HomeownerDashboard /></ClientRoute>} />
+        <Route path="/dashboard" element={<ClientRoute><HomeownerDashboard /></ClientRoute>} />
         <Route path="/create-request" element={<ClientRoute><CreateRequest /></ClientRoute>} />
-        <Route path="/requests/:id"   element={<ClientRoute><RequestDetailsPage /></ClientRoute>} />
-        <Route path="/settings"       element={<ClientRoute><ClientSettings /></ClientRoute>} />
+        <Route path="/requests/:id" element={<ClientRoute><RequestDetailsPage /></ClientRoute>} />
+        <Route path="/settings" element={<ClientRoute><ClientSettings /></ClientRoute>} />
 
         {/* Provider routes */}
         <Route path="/provider/offers" element={<ProviderRoute><ProviderAvailableOffers /></ProviderRoute>} />
