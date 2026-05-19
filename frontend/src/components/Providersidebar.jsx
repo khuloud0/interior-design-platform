@@ -32,13 +32,11 @@ export default function ProviderSidebar({ variant = "light" }) {
   ];
 
   const getIsActive = (itemPath) => {
-    const current = location.pathname;
-    if (current === itemPath) return true;
-    // تفاصيل عرض — لا يهايلت أي زر
-    if (/^\/provider\/offers\/\d+/.test(current)) return false;
-    if (/^\/provider\/projects\/\d+/.test(current)) return false;
-    return false;
-  };
+  const current = location.pathname;
+  if (/^\/provider\/offers\/\d+/.test(current)) return false;
+  if (/^\/provider\/projects\/\d+/.test(current)) return false;
+  return current === itemPath;
+};
 
   return (
     <aside style={{
