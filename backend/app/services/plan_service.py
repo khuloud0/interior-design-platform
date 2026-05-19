@@ -48,7 +48,7 @@ def create_design_plan(request_id, data):
                 order=i,
             ))
 
-    design_request.status = "in_progress"
+    design_request.status = "execution_plan_ready"
     db.session.commit()
     return {"message": "Design plan saved successfully", "plan": plan.to_dict()}, 201
 
@@ -77,6 +77,12 @@ def create_contractor_offer(request_id, data):
     db.session.add(offer)
     db.session.commit()
     return {"message": "Contractor offer published successfully", "offer": offer.to_dict()}, 201
+
+
+# ✅ كل العروض اللي نشرها المصمم لهذا الطلب (بغض النظر عن الـ status)
+def get_published_offers(request_id):
+    offers = ContractorOffer.query.filter_by(request_id=request_id).all()
+    return {"offers": [o.to_dict() for o in offers]}, 200
 
 
 def get_all_contractor_offers(provider_id=None, status=None):
@@ -183,7 +189,6 @@ def send_to_client(request_id, data):
     }, 200
 
 
-# ✅ العميل يختار عرض واحد — يلغي الباقين تلقائياً
 def select_offer(request_id, offer_id):
     design_request = DesignRequest.query.get(request_id)
     if not design_request:
@@ -195,10 +200,8 @@ def select_offer(request_id, offer_id):
     if selected.status != "selected_for_client":
         return {"error": "Offer is not available for selection"}, 400
 
-    # ✅ تفعيل العرض المختار
     selected.status = "active"
 
-    # ✅ إلغاء العروض الأخرى تلقائياً
     other_offers = ContractorOffer.query.filter(
         ContractorOffer.request_id == request_id,
         ContractorOffer.id != offer_id,
@@ -207,7 +210,6 @@ def select_offer(request_id, offer_id):
     for o in other_offers:
         o.status = "declined"
 
-    # ✅ تغيير status الطلب لـ completed
     design_request.status = "completed"
     db.session.commit()
 
