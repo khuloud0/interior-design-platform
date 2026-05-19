@@ -13,6 +13,7 @@ from app.services.plan_service import (
     create_design_plan,
     get_design_plan,
     create_contractor_offer,
+    get_published_offers,
     get_all_contractor_offers,
     get_contractor_offer_by_id,
     accept_contractor_offer,
@@ -20,7 +21,7 @@ from app.services.plan_service import (
     respond_to_offer,
     get_contractor_responses,
     send_to_client,
-    select_offer,  # ✅
+    select_offer,
 )
 
 design_request_bp = Blueprint("design_request_bp", __name__)
@@ -93,12 +94,19 @@ def fetch_plan(request_id):
     return jsonify(response), status_code
 
 
-# ── Contractor Offers (Designer → publish) ───────────────────
+# ── Contractor Offers (Designer → publish & view) ────────────
 
 @design_request_bp.route("/design-requests/<int:request_id>/contractor-offers", methods=["POST"])
 def publish_contractor_offer(request_id):
     data = request.get_json()
     response, status_code = create_contractor_offer(request_id, data)
+    return jsonify(response), status_code
+
+
+# ✅ العروض اللي نشرها المصمم — تظهر محفوظة عند إعادة فتح الصفحة
+@design_request_bp.route("/design-requests/<int:request_id>/contractor-offers/published", methods=["GET"])
+def get_published(request_id):
+    response, status_code = get_published_offers(request_id)
     return jsonify(response), status_code
 
 
