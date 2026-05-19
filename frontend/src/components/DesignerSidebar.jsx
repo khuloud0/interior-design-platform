@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, ClipboardList, Tag, User, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, ClipboardList, User, Settings, LogOut } from "lucide-react";
 import logoDark  from "../assets/images/LogoSideBarDark.svg";
 import logoLight from "../assets/images/LogoSideBarLight.svg";
 import cardDark  from "../assets/images/CardNewTools.svg";
@@ -20,30 +20,21 @@ export default function DesignerSidebar({ variant = "light" }) {
   const logoutColor   = isDark ? "rgba(255,255,255,0.35)"       : "rgba(44,34,26,0.35)";
   const borderRight   = isDark ? "none"                         : "1px solid #E2D8CE";
   const boxShadow     = isDark ? "4px 0 24px rgba(0,0,0,0.35)" : "6px 0 24px rgba(140,123,107,0.10)";
-
   const logo = isDark ? logoDark  : logoLight;
   const card = isDark ? cardDark  : cardLight;
 
   const navItems = [
     { icon: <LayoutDashboard size={18} strokeWidth={1.5} />, label: "Dashboard",       path: "/designer/dashboard" },
-    { icon: <ClipboardList size={18} strokeWidth={1.5} />, label: "Manage Requests",   path: "/designer/manage" },
-    { icon: <Tag             size={18} strokeWidth={1.5} />, label: "Offers",          path: "/designer/offers"    },
+    { icon: <ClipboardList   size={18} strokeWidth={1.5} />, label: "Manage Requests", path: "/designer/manage"    },
     { icon: <User            size={18} strokeWidth={1.5} />, label: "My Profile",      path: "/designer/profile"   },
     { icon: <Settings        size={18} strokeWidth={1.5} />, label: "Settings",        path: "/designer/settings"  },
   ];
 
   const getIsActive = (itemPath) => {
     const current = location.pathname;
-
-    // صفحة تفاصيل الطلب — لا تهايلت أي زر
     if (/^\/designer\/requests\/\d+/.test(current)) return false;
-
-    // مطابقة تامة للـ path
     if (current === itemPath) return true;
-
-    // Manage Requests — يهايلت فقط على /designer/requests بالضبط
     if (itemPath === "/designer/requests" && current === "/designer/requests") return true;
-
     return false;
   };
 
