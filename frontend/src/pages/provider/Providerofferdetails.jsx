@@ -61,10 +61,7 @@ export default function ProviderOfferDetails() {
   const [acting, setActing]     = useState(false);
   const [error, setError]       = useState("");
   const [showForm, setShowForm] = useState(false);
-
-  const [myOffer, setMyOffer] = useState({
-    budget: "", duration: "", description: "", notes: "",
-  });
+  const [myOffer, setMyOffer]   = useState({ budget: "", duration: "", description: "", notes: "" });
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const [offerError, setOfferError]           = useState("");
 
@@ -76,7 +73,7 @@ export default function ProviderOfferDetails() {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}`, {
+        const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -88,50 +85,66 @@ export default function ProviderOfferDetails() {
     load();
   }, [id]);
 
+  // ── Accept as-is: update status locally instead of navigating away
   const handleAcceptAsIs = async () => {
     setActing(true); setError("");
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/accept`, {
+      const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/accept`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ provider_id: provider?.id }),
       });
       const data = await res.json();
-      if (res.ok) navigate("/provider/projects");
-      else setError(data.message || "Something went wrong.");
+      if (res.ok) {
+        // Lock the UI immediately — prevents a second submission
+        setOffer(prev => ({ ...prev, status: "active" }));
+      } else {
+        setError(data.message || "Something went wrong.");
+      }
     } catch { setError("Network error."); }
     finally { setActing(false); }
   };
 
+  // ── Submit custom offer: update status + store submitted values locally
   const handleSubmitMyOffer = async () => {
     setOfferError("");
     if (!myOffer.budget || isNaN(Number(myOffer.budget))) { setOfferError("Please enter a valid budget."); return; }
     if (!myOffer.duration) { setOfferError("Please enter a duration."); return; }
+
     setSubmittingOffer(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/respond`, {
+      const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/respond`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...myOffer,
-          budget: Number(myOffer.budget),
-          provider_id: provider?.id,
-        }),
+        body: JSON.stringify({ ...myOffer, budget: Number(myOffer.budget), provider_id: provider?.id }),
       });
       const data = await res.json();
-      if (res.ok) navigate("/provider/projects");
-      else setOfferError(data.message || "Something went wrong.");
+      if (res.ok) {
+        // Lock the UI immediately — prevents a second submission
+        setOffer(prev => ({
+          ...prev,
+          status:               "submitted",
+          provider_budget:      Number(myOffer.budget),
+          provider_duration:    myOffer.duration,
+          provider_description: myOffer.description,
+          provider_notes:       myOffer.notes,
+        }));
+        setShowForm(false);
+      } else {
+        setOfferError(data.message || "Something went wrong.");
+      }
     } catch { setOfferError("Network error."); }
     finally { setSubmittingOffer(false); }
   };
 
+  // ── Decline
   const handleDecline = async () => {
     setActing(true); setError("");
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/decline`, {
+      const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/decline`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ provider_id: provider?.id }),
@@ -158,6 +171,7 @@ export default function ProviderOfferDetails() {
 
         <main style={{ flex: 1, overflowY: "auto", padding: "32px 40px" }}>
 
+          {/* Top bar */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
             <button onClick={() => navigate("/provider/offers")}
               style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: C.stone, fontSize: 12, fontFamily: f.font, letterSpacing: "0.05em" }}
@@ -171,16 +185,20 @@ export default function ProviderOfferDetails() {
             </div>
           </div>
 
+          {/* Loading */}
           {loading ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {[120, 300, 200].map((h, i) => (
                 <div key={i} style={{ height: h, background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 14 }} />
               ))}
             </div>
+
           ) : error && !offer ? (
             <div style={{ textAlign: "center", padding: "80px 0", color: C.muted, fontFamily: f.serif, fontSize: 20 }}>{error}</div>
+
           ) : offer && (
             <>
+              {/* Header */}
               <div style={{ marginBottom: 24 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
                   <div>
@@ -191,9 +209,7 @@ export default function ProviderOfferDetails() {
                       {offer.work_type}
                     </h1>
                     {offer.designer_name && (
-                      <div style={{ fontSize: 11, color: C.muted, fontWeight: 300 }}>
-                        Posted by {offer.designer_name}
-                      </div>
+                      <div style={{ fontSize: 11, color: C.muted, fontWeight: 300 }}>Posted by {offer.designer_name}</div>
                     )}
                   </div>
                   <StatusBadge status={offer.status} />
@@ -202,10 +218,10 @@ export default function ProviderOfferDetails() {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, alignItems: "start" }}>
 
-                {/* Left */}
+                {/* ── LEFT ── */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-                  {/* تفاصيل العرض الأصلي من المصمم */}
+                  {/* Designer's offer */}
                   <div style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 14, padding: "24px 28px" }}>
                     <div style={{ fontSize: 11, fontWeight: 500, color: C.stone, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 14 }}>
                       Designer's Offer
@@ -216,6 +232,7 @@ export default function ProviderOfferDetails() {
                     <DetailRow icon={<FileText   size={14} strokeWidth={1.5} />} label="Notes"     value={offer.notes} />
                   </div>
 
+                  {/* Description */}
                   {offer.description && (
                     <div style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 14, padding: "24px 28px" }}>
                       <div style={{ fontSize: 11, fontWeight: 500, color: C.stone, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 14 }}>
@@ -225,7 +242,7 @@ export default function ProviderOfferDetails() {
                     </div>
                   )}
 
-                  {/* ✅ عرض المقاول المخصص — يظهر بعد التقديم */}
+                  {/* My submitted offer — shown after submission */}
                   {offer.status === "submitted" && offer.provider_budget && (
                     <div style={{ background: C.card, border: `0.5px solid rgba(201,144,42,0.3)`, borderRadius: 14, padding: "24px 28px" }}>
                       <div style={{ fontSize: 11, fontWeight: 500, color: C.accent, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
@@ -239,8 +256,8 @@ export default function ProviderOfferDetails() {
                     </div>
                   )}
 
-                  {/* فورم العرض المخصص */}
-                  {showForm && (
+                  {/* Custom offer form — only shown when pending and not yet submitted */}
+                  {showForm && offer.status === "pending" && (
                     <div style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 14, padding: "24px 28px" }}>
                       <div style={{ fontSize: 11, fontWeight: 500, color: C.stone, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 20, paddingBottom: 10, borderBottom: `0.5px solid ${C.border}` }}>
                         My Custom Offer
@@ -294,7 +311,7 @@ export default function ProviderOfferDetails() {
                   )}
                 </div>
 
-                {/* Right */}
+                {/* ── RIGHT ── */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                   <div style={{ background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 14, padding: "24px 28px" }}>
                     <div style={{ fontSize: 9, color: C.muted, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>Offer Summary</div>
@@ -321,7 +338,7 @@ export default function ProviderOfferDetails() {
                       </div>
                     )}
 
-                    {/* الأزرار — pending فقط */}
+                    {/* Actions — pending only, and only if form is not open */}
                     {offer.status === "pending" && !showForm && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                         <button onClick={handleAcceptAsIs} disabled={acting}
@@ -348,7 +365,7 @@ export default function ProviderOfferDetails() {
                       </div>
                     )}
 
-                    {/* submitted */}
+                    {/* Submitted */}
                     {offer.status === "submitted" && (
                       <div style={{ padding: "12px 14px", borderRadius: 8, background: "rgba(201,144,42,0.08)", border: "0.5px solid rgba(201,144,42,0.2)", fontSize: 12, color: "#9B5E2A", display: "flex", alignItems: "center", gap: 8 }}>
                         <CheckCircle size={13} strokeWidth={1.5} />
@@ -356,7 +373,7 @@ export default function ProviderOfferDetails() {
                       </div>
                     )}
 
-                    {/* active */}
+                    {/* Active */}
                     {offer.status === "active" && (
                       <div style={{ padding: "12px 14px", borderRadius: 8, background: "rgba(74,102,69,0.08)", border: "0.5px solid rgba(74,102,69,0.2)", fontSize: 12, color: C.success, display: "flex", alignItems: "center", gap: 8 }}>
                         <CheckCircle size={13} strokeWidth={1.5} />
@@ -364,14 +381,13 @@ export default function ProviderOfferDetails() {
                       </div>
                     )}
 
-                    {/* declined */}
+                    {/* Declined */}
                     {offer.status === "declined" && (
                       <div style={{ padding: "12px 14px", borderRadius: 8, background: "rgba(176,80,48,0.07)", border: "0.5px solid rgba(176,80,48,0.2)", fontSize: 12, color: C.error, display: "flex", alignItems: "center", gap: 8 }}>
                         <XCircle size={13} strokeWidth={1.5} />
                         You declined this offer.
                       </div>
                     )}
-
                   </div>
                 </div>
 
