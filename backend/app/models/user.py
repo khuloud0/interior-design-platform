@@ -15,6 +15,7 @@ class User(db.Model):
 
     email_verified = db.Column(db.Boolean, default=False)
     phone_verified = db.Column(db.Boolean, default=False)
+    city = db.Column(db.String(100), nullable=True)
 
     provider_profile = db.relationship(
         "ProviderProfile",
