@@ -6,12 +6,19 @@ from flask_cors import CORS
 db = SQLAlchemy()
 jwt = JWTManager()
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object("app.config.DevelopmentConfig")
+
     CORS(app)
     db.init_app(app)
     jwt.init_app(app)
+
+    # ✅ يجعل الـ identity يُقبل كـ dict
+    @jwt.user_identity_loader
+    def user_identity_lookup(identity):
+        return identity
 
     # ✅ الترتيب مهم: DesignRequest قبل DesignPlan و ContractorOffer
     from app.models import User, ProviderProfile, DesignerProfile
