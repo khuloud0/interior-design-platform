@@ -16,6 +16,9 @@ import ManageRequests          from "./pages/designer/ManageRequests";
 import ProviderAvailableOffers from "./pages/provider/ProviderAvailableOffers";
 import ProviderOfferDetails    from "./pages/provider/ProviderOfferDetails";
 import ProviderMyProjects      from "./pages/provider/ProviderMyProjects";
+import ProviderSettings        from "./pages/provider/ProviderSettings";
+import ClientSettings          from "./pages/homeowner/ClientSettings";
+import DesignerSettings        from "./pages/designer/DesignerSettings";
 
 const ClientRoute = ({ children }) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -55,16 +58,19 @@ function App() {
         <Route path="/designer/MyProfile"    element={<DesignerRoute><MyProfile /></DesignerRoute>} />
         <Route path="/designer/requests/:id/create-plan" element={<DesignerRoute><CreatePlan /></DesignerRoute>} />
         <Route path="/designer/manage"       element={<DesignerRoute><ManageRequests /></DesignerRoute>} />
+        <Route path="/designer/settings"     element={<DesignerRoute><DesignerSettings /></DesignerRoute>} />
 
         {/* Client routes */}
         <Route path="/dashboard"      element={<ClientRoute><HomeownerDashboard /></ClientRoute>} />
         <Route path="/create-request" element={<ClientRoute><CreateRequest /></ClientRoute>} />
         <Route path="/requests/:id"   element={<ClientRoute><RequestDetailsPage /></ClientRoute>} />
+        <Route path="/settings"       element={<ClientRoute><ClientSettings /></ClientRoute>} />
 
         {/* Provider routes */}
         <Route path="/provider/offers" element={<ProviderRoute><ProviderAvailableOffers /></ProviderRoute>} />
         <Route path="/provider/offers/:id" element={<ProviderRoute><ProviderOfferDetails /></ProviderRoute>} />
         <Route path="/provider/projects" element={<ProviderRoute><ProviderMyProjects /></ProviderRoute>} />
+        <Route path="/provider/settings" element={<ProviderRoute><ProviderSettings /></ProviderRoute>} />
       </Routes>
     </BrowserRouter>
   );
