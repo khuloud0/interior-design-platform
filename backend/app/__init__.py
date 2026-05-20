@@ -21,7 +21,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
 
-    # الترتيب مهم: DesignRequest قبل DesignPlan و ContractorOffer
+    # ترتيب المودلز مهم: DesignRequest قبل DesignPlan و ContractorOffer
     from app.models import User, ProviderProfile, DesignerProfile
     from app.models.design_request import DesignRequest
     from app.models.design_plan import DesignPlan, PlanStage
@@ -33,11 +33,9 @@ def create_app():
     from app.routes.auth_routes import auth_bp
     from app.routes.request_routes import design_request_bp
     from app.routes.designer_routes import designer_bp
-    from app.routes.plan_routes import plan_bp
-    
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(design_request_bp)
     app.register_blueprint(designer_bp)
-    app.register_blueprint(plan_bp)
-    
+
     return app
