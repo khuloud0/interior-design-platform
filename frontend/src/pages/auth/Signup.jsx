@@ -55,7 +55,21 @@ const handleChange = (e) => {
 
     return;
   }
+if (name === "phone") {
+  const phoneRegex = /^\+966[0-9]{7}$/;
 
+  if (!value) {
+    setErrors({ ...errors, phone: "Phone is required" });
+  } else if (!/^\+[0-9]*$/.test(value)) {
+    setErrors({ ...errors, phone: "Phone must use English numbers only and start with +966" });
+  } else if (!phoneRegex.test(value)) {
+    setErrors({ ...errors, phone: "Phone must be in this format: +9665123456" });
+  } else {
+    setErrors({ ...errors, phone: "" });
+  }
+
+  return;
+}
   setErrors({ ...errors, [name]: "" });
 };
 
@@ -69,7 +83,16 @@ const handleChange = (e) => {
     } else if (!emailRegex.test(formData.email)) {
         e.email = "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com";
     }
-    if (!formData.phone) e.phone = "Phone is required";
+
+    const phoneRegex = /^\+966[0-9]{7}$/;
+
+    if (!formData.phone) {
+       e.phone = "Phone is required";
+    } else if (!/^\+[0-9]*$/.test(formData.phone)) {
+       e.phone = "Phone must use English numbers only and start with +966";
+    } else if (!phoneRegex.test(formData.phone)) {
+       e.phone = "Phone must be in this format: +9665123456";
+}   
     if (!formData.password) {
       e.password = "Password is required";
     } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(formData.password)) {
