@@ -70,6 +70,22 @@ if (name === "phone") {
 
   return;
 }
+ if (name === "password") {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+
+  if (!value) {
+    setErrors({ ...errors, password: "Password is required" });
+  } else if (!passwordRegex.test(value)) {
+    setErrors({
+      ...errors,
+      password: "Must include uppercase, lowercase, number & special character",
+    });
+  } else {
+    setErrors({ ...errors, password: "" });
+  }
+
+  return;
+}
   setErrors({ ...errors, [name]: "" });
 };
 
