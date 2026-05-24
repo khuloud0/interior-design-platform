@@ -168,10 +168,17 @@ export default function CreateRequestModal({
                 onBlur={e => e.target.style.borderColor = C.border} />
             </Field>
             <Field label="Desired Start Date" half>
-              <input className="cr-inp" name="desired_start" value={form.desired_start} onChange={set}
-                placeholder="e.g. June 15, 2025" style={inpSt()}
-                onFocus={e => e.target.style.borderColor = C.stone}
-                onBlur={e => e.target.style.borderColor = C.border} />
+            <input
+              className="cr-inp"
+              type="date"
+              name="desired_start"
+              value={form.desired_start}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={set}
+              style={inpSt()}
+              onFocus={e => e.target.style.borderColor = C.stone}
+              onBlur={e => e.target.style.borderColor = C.border}
+              />
             </Field>
             <Field label="Project Duration" half>
               <Sel name="duration" value={form.duration} onChange={set}
