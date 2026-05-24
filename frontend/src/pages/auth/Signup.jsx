@@ -34,15 +34,41 @@ export default function Signup() {
 
   const roles = ["client", "designer", "provider"];
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
-  };
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData({ ...formData, [name]: value });
+
+  if (name === "email") {
+    const emailRegex = /^[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo|microsoft)\.com$/;
+
+    if (!value) {
+      setErrors({ ...errors, email: "Email is required" });
+    } else if (!emailRegex.test(value)) {
+      setErrors({
+        ...errors,
+        email: "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com",
+      });
+    } else {
+      setErrors({ ...errors, email: "" });
+    }
+
+    return;
+  }
+
+  setErrors({ ...errors, [name]: "" });
+};
 
   const validate = () => {
     const e = {};
     if (!formData.name) e.name = "Name is required";
-    if (!formData.email) e.email = "Email is required";
+    const emailRegex = /^[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo|microsoft)\.com$/;
+
+    if (!formData.email) {
+        e.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+        e.email = "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com";
+    }
     if (!formData.phone) e.phone = "Phone is required";
     if (!formData.password) {
       e.password = "Password is required";
