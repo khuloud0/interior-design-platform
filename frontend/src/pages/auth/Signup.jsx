@@ -20,6 +20,7 @@ export default function Signup() {
   };
 
   const inputWrap = { position: "relative", display: "flex", alignItems: "center" };
+
   const inputStyle = (hasError) => ({
     width: "100%", background: c.inputBg,
     border: `1px solid ${hasError ? c.error : c.border}`,
@@ -27,6 +28,7 @@ export default function Signup() {
     fontSize: "12px", fontFamily: "'Jost', sans-serif",
     fontWeight: 300, color: c.dark, outline: "none", boxSizing: "border-box",
   });
+
   const iconStyle = {
     position: "absolute", right: "11px", color: c.muted,
     display: "flex", alignItems: "center", pointerEvents: "none",
@@ -34,62 +36,186 @@ export default function Signup() {
 
   const roles = ["client", "designer", "provider"];
 
+  const emailRegex    = /^[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo|microsoft)\.com$/;
+  // ✅ الجوال: أرقام إنجليزية فقط، 9 أرقام، يبدأ بـ 5
+  const phoneRegex    = /^5[0-9]{8}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+
+  // ✅ الاسم: حروف عربية أو إنجليزية فقط — يمنع الأرقام العربية والإنجليزية والرموز
+  // \u0600-\u0605 و \u060B-\u065F و \u0670-\u06EF هي الحروف العربية بدون الأرقام
+  const nameRegex = /^[A-Za-z\u0621-\u064A\u0660-\u0669\u066E\u066F\u0671-\u06D3\u06D5\s]+$/;
+  // الأبسط: نمنع أي رقم (عربي أو إنجليزي) ونمنع الرموز
+  const isValidName = (val) => /^[^\d\u0660-\u0669!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/.test(val);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "name") {
+      if (!value) {
+        setErrors({ ...errors, name: "Name is required" });
+      } else if (!isValidName(value)) {
+        setErrors({ ...errors, name: "Name must contain letters only, no numbers or symbols" });
+      } else {
+        setErrors({ ...errors, name: "" });
+      }
+      return;
+    }
+
+    if (name === "email") {
+      if (!value) {
+        setErrors({ ...errors, email: "Email is required" });
+      } else if (!emailRegex.test(value)) {
+        setErrors({
+          ...errors,
+          email: "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com",
+        });
+      } else {
+        setErrors({ ...errors, email: "" });
+      }
+      return;
+    }
+
+    if (name === "phone") {
+      if (!value) {
+        setErrors({ ...errors, phone: "Phone is required" });
+      } else if (!/^[0-9]+$/.test(value)) {
+        setErrors({ ...errors, phone: "Phone must contain English numbers only" });
+      } else if (!phoneRegex.test(value)) {
+        setErrors({ ...errors, phone: "Phone must start with 5 and be 9 digits (e.g. 501234567)" });
+      } else {
+        setErrors({ ...errors, phone: "" });
+      }
+      return;
+    }
+
+    if (name === "password") {
+      if (!value) {
+        setErrors({ ...errors, password: "Password is required" });
+      } else if (!passwordRegex.test(value)) {
+        setErrors({
+          ...errors,
+          password: "Password must be at least 8 characters and include uppercase, lowercase, number & special character",
+        });
+      } else {
+        setErrors({ ...errors, password: "" });
+      }
+      return;
+    }
+
+    setErrors({ ...errors, [name]: "" });
   };
 
   const validate = () => {
     const e = {};
-    if (!formData.name) e.name = "Name is required";
-    if (!formData.email) e.email = "Email is required";
-    if (!formData.phone) e.phone = "Phone is required";
+
+    if (!formData.name) {
+      e.name = "Name is required";
+    } else if (!isValidName(formData.name)) {
+      e.name = "Name must contain letters only, no numbers or symbols";
+    }
+
+    if (!formData.email) {
+      e.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      e.email = "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com";
+    }
+
+    if (!formData.phone) {
+      e.phone = "Phone is required";
+    } else if (!/^[0-9]+$/.test(formData.phone)) {
+      e.phone = "Phone must contain English numbers only";
+    } else if (!phoneRegex.test(formData.phone)) {
+      e.phone = "Phone must start with 5 and be 9 digits (e.g. 501234567)";
+    }
+
     if (!formData.password) {
       e.password = "Password is required";
-    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(formData.password)) {
+    } else if (!passwordRegex.test(formData.password)) {
       e.password = "Must include uppercase, lowercase, number & special character";
     }
+
     return e;
   };
 
   const getPasswordStrength = () => {
     const p = formData.password;
     if (!p) return null;
-    const score = [/[A-Z]/.test(p), /[a-z]/.test(p), /\d/.test(p),
-      /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p), p.length >= 8].filter(Boolean).length;
-    if (score <= 2) return { label: "Weak",   color: "#B05030" };
+    const score = [
+      /[A-Z]/.test(p), /[a-z]/.test(p), /\d/.test(p),
+      /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p),
+      p.length >= 8,
+    ].filter(Boolean).length;
+    if (score <= 2) return { label: "Weak",     color: "#B05030" };
     if (score <= 3) return { label: "Moderate", color: "#C97D4E" };
-    return              { label: "Strong", color: "#5C7057" };
+    return              { label: "Strong",   color: "#5C7057" };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.removeItem("user"); localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
+    if (!selectedRole) {
+      setErrors({ role: "Please select a role" });
+      return;
+    }
+
     const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return; }
-    if (!selectedRole) { setErrors({ role: "Please select a role" }); return; }
-    setLoading(true); setMessage(""); setIsError(false);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+    setIsError(false);
+
     try {
-      const res = await axios.post("http://127.0.0.1:5000/auth/register", { ...formData, role: selectedRole });
-      const user = res.data?.user; const token = res.data?.token;
-      if (!user) { setMessage("Signup failed. Please try again."); setIsError(true); return; }
+      const res = await axios.post("http://127.0.0.1:5000/auth/register", {
+        ...formData,
+        // ✅ نضيف +966 قبل الإرسال للباك
+        phone: "+966" + formData.phone,
+        role: selectedRole,
+      });
+
+      const user  = res.data?.user;
+      const token = res.data?.token;
+
+      if (!user) {
+        setMessage("Signup failed. Please try again.");
+        setIsError(true);
+        return;
+      }
+
       const userWithRole = { ...user, role: selectedRole };
       localStorage.setItem("user", JSON.stringify(userWithRole));
       if (token) localStorage.setItem("token", token);
-      setMessage("Account created successfully."); setIsError(false);
+
+      setMessage("Account created successfully.");
+      setIsError(false);
+
       setTimeout(() => {
-        window.location.href = userWithRole.role === "designer" ? "/designer/requests"
-          : userWithRole.role === "client" ? "/dashboard" : "/";
+        window.location.href =
+          userWithRole.role === "designer" ? "/designer/requests"
+          : userWithRole.role === "client"   ? "/dashboard"
+          : "/";
       }, 1500);
     } catch (err) {
-      localStorage.removeItem("user"); localStorage.removeItem("token");
-      setMessage(err.response?.data?.error || err.response?.data?.message || "This email or phone is already registered.");
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      setMessage(
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "This email or phone is already registered."
+      );
       setIsError(true);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const strength = getPasswordStrength();
-  const isSubmitDisabled = !selectedRole || loading;
 
   return (
     <>
@@ -105,7 +231,11 @@ export default function Signup() {
         .signin-link:hover { color: #3D3128 !important; }
       `}</style>
 
-      <div style={{ height: "100vh", overflow: "hidden", display: "grid", gridTemplateColumns: "1fr 1fr", fontFamily: "'Jost', sans-serif" }}>
+      <div style={{
+        height: "100vh", overflow: "hidden",
+        display: "grid", gridTemplateColumns: "1fr 1fr",
+        fontFamily: "'Jost', sans-serif",
+      }}>
 
         {/* LEFT — Image */}
         <div style={{ overflow: "hidden" }}>
@@ -119,7 +249,8 @@ export default function Signup() {
           borderLeft: `1px solid ${c.border}`, overflowY: "auto",
         }}>
           <div>
-            {/* Logo + Sign in link */}
+
+            {/* Logo + Sign in */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "40px" }}>
               <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: "9px", textDecoration: "none" }}>
                 <img src={logo} alt="Swagne" style={{ height: "27px" }} />
@@ -137,11 +268,15 @@ export default function Signup() {
             }}>Create your account</h1>
 
             <form onSubmit={handleSubmit}>
+
               {/* Full Name */}
               <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Full Name</label>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
+                  Full Name <span style={{ color: c.error }}>*</span>
+                </label>
                 <div style={inputWrap}>
-                  <input name="name" type="text" placeholder="Enter your full name" onChange={handleChange} style={inputStyle(!!errors.name)} />
+                  <input name="name" type="text" placeholder="Enter your full name"
+                    onChange={handleChange} style={inputStyle(!!errors.name)} />
                   <span style={iconStyle}><User size={14} strokeWidth={1.5} /></span>
                 </div>
                 {errors.name && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.name}</div>}
@@ -149,9 +284,12 @@ export default function Signup() {
 
               {/* Email */}
               <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Email</label>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
+                  Email <span style={{ color: c.error }}>*</span>
+                </label>
                 <div style={inputWrap}>
-                  <input name="email" type="email" placeholder="Enter your email address" onChange={handleChange} style={inputStyle(!!errors.email)} />
+                  <input name="email" type="email" placeholder="Enter your email address"
+                    onChange={handleChange} style={inputStyle(!!errors.email)} />
                   <span style={iconStyle}><Mail size={14} strokeWidth={1.5} /></span>
                 </div>
                 {errors.email && <div style={{ fontSize: "10px", color: c.error, marginTop: "4px" }}>{errors.email}</div>}
@@ -159,14 +297,17 @@ export default function Signup() {
 
               {/* Phone */}
               <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Phone</label>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
+                  Phone <span style={{ color: c.error }}>*</span>
+                </label>
                 <div style={inputWrap}>
                   <span style={{
                     position: "absolute", left: "12px", fontSize: "12px", fontWeight: 400,
                     color: c.dark, pointerEvents: "none", zIndex: 1, userSelect: "none",
                     borderRight: `1px solid ${c.border}`, paddingRight: "10px",
                   }}>+966</span>
-                  <input name="phone" type="tel" placeholder="Enter your phone number" onChange={handleChange}
+                  <input name="phone" type="tel" placeholder="5XXXXXXXX"
+                    onChange={handleChange}
                     style={{ ...inputStyle(!!errors.phone), paddingLeft: "58px", paddingRight: "36px" }} />
                   <span style={iconStyle}><Phone size={14} strokeWidth={1.5} /></span>
                 </div>
@@ -175,7 +316,9 @@ export default function Signup() {
 
               {/* Password */}
               <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>Password</label>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
+                  Password <span style={{ color: c.error }}>*</span>
+                </label>
                 <div style={inputWrap}>
                   <input name="password" type={showPassword ? "text" : "password"}
                     placeholder="Create a password" onChange={handleChange}
@@ -192,7 +335,8 @@ export default function Signup() {
                         height: "2px", flex: 1, borderRadius: "1px",
                         background: i === 1 ? strength.color
                           : i === 2 && strength.label !== "Weak" ? strength.color
-                          : i === 3 && strength.label === "Strong" ? strength.color : c.border,
+                          : i === 3 && strength.label === "Strong" ? strength.color
+                          : c.border,
                         transition: "background 0.3s",
                       }} />
                     ))}
@@ -206,11 +350,13 @@ export default function Signup() {
 
               {/* Role */}
               <div style={{ marginBottom: "18px" }}>
-                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>I am a</label>
+                <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
+                  I am a <span style={{ color: c.error }}>*</span>
+                </label>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "8px" }}>
                   {roles.map(r => (
                     <button key={r} type="button" className="role-btn"
-                      onClick={() => setSelectedRole(r)}
+                      onClick={() => { setSelectedRole(r); setErrors({ ...errors, role: "" }); }}
                       style={{
                         background: selectedRole === r ? c.dark : c.inputBg,
                         border: `1px solid ${selectedRole === r ? c.dark : c.border}`,
@@ -228,13 +374,13 @@ export default function Signup() {
               </div>
 
               {/* Submit */}
-              <button type="submit" className="submit-btn" disabled={isSubmitDisabled}
+              <button type="submit" className="submit-btn" disabled={loading}
                 style={{
                   width: "100%", padding: "12px", border: "none", borderRadius: "8px",
                   background: c.dark, color: c.sand, fontSize: "11px", fontWeight: 500,
                   fontFamily: "'Jost', sans-serif", letterSpacing: "0.16em", textTransform: "uppercase",
-                  cursor: isSubmitDisabled ? "not-allowed" : "pointer",
-                  opacity: isSubmitDisabled ? 0.38 : 1, transition: "background 0.2s, opacity 0.2s",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.5 : 1, transition: "background 0.2s, opacity 0.2s",
                 }}>
                 {loading ? "Creating..." : "Create Account"}
               </button>
@@ -253,7 +399,7 @@ export default function Signup() {
 
           {/* Footer */}
           <p style={{ textAlign: "center", fontSize: "11px", color: c.muted, fontWeight: 300, marginTop: "24px" }}>
-            © 2026 Swagne. All rights reserved.
+            ©️ 2026 Swagne. All rights reserved.
           </p>
         </div>
       </div>
