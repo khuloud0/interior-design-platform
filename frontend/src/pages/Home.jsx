@@ -316,6 +316,7 @@ export default function HomePage() {
           border: 1px solid #E2D8CE;
           display: grid;
           grid-template-columns: repeat(2, 1fr);
+          grid-template-rows: repeat(2, 1fr);
           gap: 8px;
           padding: 16px;
           box-shadow: 0 18px 45px rgba(44,34,26,.08);
@@ -326,6 +327,56 @@ export default function HomePage() {
           border-radius: 8px;
           background: #F7F1EA;
           border: 1px solid #D4C4B0;
+        }
+
+        .node-one span {
+          grid-column: 1;
+          grid-row: 1;
+        }
+
+        .node-two span:nth-child(1) {
+          grid-column: 1;
+          grid-row: 1;
+        }
+
+        .node-two span:nth-child(2) {
+          grid-column: 2;
+          grid-row: 1;
+        }
+
+        .node-three span:nth-child(1) {
+          grid-column: 1;
+          grid-row: 1;
+        }
+
+        .node-three span:nth-child(2) {
+          grid-column: 2;
+          grid-row: 1;
+        }
+
+        .node-three span:nth-child(3) {
+          grid-column: 1;
+          grid-row: 2;
+        }
+
+        .node-four span:nth-child(1) {
+          grid-column: 1;
+          grid-row: 1;
+        }
+
+        .node-four span:nth-child(2) {
+          grid-column: 2;
+          grid-row: 1;
+        }
+
+        .node-four span:nth-child(3) {
+          grid-column: 1;
+          grid-row: 2;
+        }
+
+        .node-four span:nth-child(4) {
+          grid-column: 2;
+          grid-row: 2;
         }
 
         .road-step.final .logo-node {
@@ -343,18 +394,9 @@ export default function HomePage() {
           box-shadow: 0 24px 55px rgba(44,34,26,.14);
         }
 
-        .road-number {
-          color: #8C7B6B;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: .18em;
-          text-transform: uppercase;
-          margin-bottom: 10px;
-        }
-
         .road-step h3 {
           font-size: 27px;
-          margin: 0 0 10px;
+          margin: 0 0 16px;
         }
 
         .road-step p {
@@ -685,25 +727,37 @@ export default function HomePage() {
             <div className="benefit-card">
               <div className="icon"><ClipboardList size={25} /></div>
               <h3>Complete Clarity</h3>
-              <p>Know what needs to happen, when it happens, and who is responsible for each step.</p>
+              <p>
+                Know what needs to happen, when it happens, and who is
+                responsible for each step.
+              </p>
             </div>
 
             <div className="benefit-card">
               <div className="icon"><Zap size={25} /></div>
               <h3>Organized Workflow</h3>
-              <p>Move from request to execution without scattered messages or unclear next steps.</p>
+              <p>
+                Move from request to execution without scattered messages or
+                unclear next steps.
+              </p>
             </div>
 
             <div className="benefit-card">
               <div className="icon"><Eye size={25} /></div>
               <h3>Better Decisions</h3>
-              <p>Compare offers and designer recommendations before selecting providers.</p>
+              <p>
+                Compare offers and designer recommendations before selecting
+                providers.
+              </p>
             </div>
 
             <div className="benefit-card">
               <div className="icon"><Handshake size={25} /></div>
               <h3>Trusted Support</h3>
-              <p>Keep the design vision connected to the execution process until completion.</p>
+              <p>
+                Keep the design vision connected to the execution process until
+                completion.
+              </p>
             </div>
           </div>
         </section>
@@ -713,52 +767,58 @@ export default function HomePage() {
             <div className="eyebrow">Execution Journey</div>
             <h2>From request to execution in clear steps.</h2>
             <p>
-              A simple roadmap inspired by Swagne’s identity, showing how each step connects from vision to delivery.
+              A simple roadmap inspired by Swagne’s logo, showing how the
+              journey grows step by step until the project is fully organized.
             </p>
           </div>
 
           <div className="brand-roadmap">
             <div className="road-step">
-              <div className="logo-node">
-                <span></span><span></span><span></span><span></span>
+              <div className="logo-node node-one">
+                <span></span>
               </div>
               <div>
-                <div className="road-number">01</div>
                 <h3>Submit Request</h3>
                 <p>Share your space, budget, preferred style, and project needs.</p>
               </div>
             </div>
 
             <div className="road-step">
-              <div className="logo-node">
-                <span></span><span></span><span></span><span></span>
+              <div className="logo-node node-two">
+                <span></span>
+                <span></span>
               </div>
               <div>
-                <div className="road-number">02</div>
                 <h3>Get Plan</h3>
                 <p>A designer turns your request into clear execution steps.</p>
               </div>
             </div>
 
             <div className="road-step">
-              <div className="logo-node">
-                <span></span><span></span><span></span><span></span>
+              <div className="logo-node node-three">
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
               <div>
-                <div className="road-number">03</div>
                 <h3>Compare Offers</h3>
                 <p>Review provider offers, timelines, and recommendations clearly.</p>
               </div>
             </div>
 
             <div className="road-step final">
-              <div className="logo-node">
-                <span></span><span></span><span></span><span></span>
+              <div className="logo-node node-four">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
               <div>
-                <div className="road-number">04</div>
                 <h3>Select & Track</h3>
-                <p>Choose providers and follow project progress from one dashboard.</p>
+                <p>
+                  Choose providers and follow project progress from one
+                  dashboard.
+                </p>
               </div>
             </div>
           </div>
@@ -838,7 +898,8 @@ export default function HomePage() {
           <div className="footer-inner">
             <h2>Ready to start your interior project?</h2>
             <p>
-              Choose your role and create an account to continue with the right experience.
+              Choose your role and create an account to continue with the right
+              experience.
             </p>
             <a className="light-btn" href="#roles">Choose Role</a>
           </div>
