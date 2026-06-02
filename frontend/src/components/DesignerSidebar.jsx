@@ -1,78 +1,101 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, ClipboardList, Tag, User, Settings, LogOut } from "lucide-react";
-import logoDark  from "../assets/images/LogoSideBarDark.svg";
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Tag,
+  User,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
+
+import logoDark from "../assets/images/LogoSideBarDark.svg";
 import logoLight from "../assets/images/LogoSideBarLight.svg";
-import cardDark  from "../assets/images/CardNewTools.svg";
+import cardDark from "../assets/images/CardNewTools.svg";
 import cardLight from "../assets/images/CardNewToolsLight.svg";
 
 export default function DesignerSidebar({ variant = "light" }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const isDark   = variant === "dark";
+  const [open, setOpen] = useState(false);
 
-  const sidebarBg     = isDark ? "#1E1610"                      : "#FAF7F4";
-  const activeBg      = isDark ? "rgba(255,255,255,0.10)"       : "rgba(201,144,42,0.12)";
-  const activeColor   = isDark ? "#FFFFFF"                      : "#2C221A";
-  const inactiveColor = isDark ? "rgba(255,255,255,0.50)"       : "rgba(44,34,26,0.45)";
-  const activeBorder  = isDark ? "rgba(212,196,176,0.6)"        : "#C9902A";
-  const hoverBg       = isDark ? "rgba(255,255,255,0.05)"       : "rgba(201,144,42,0.07)";
-  const logoutColor   = isDark ? "rgba(255,255,255,0.35)"       : "rgba(44,34,26,0.35)";
-  const borderRight   = isDark ? "none"                         : "1px solid #E2D8CE";
-  const boxShadow     = isDark ? "4px 0 24px rgba(0,0,0,0.35)" : "6px 0 24px rgba(140,123,107,0.10)";
+  const isDark = variant === "dark";
 
-  const logo = isDark ? logoDark  : logoLight;
-  const card = isDark ? cardDark  : cardLight;
+  const sidebarBg = isDark ? "#1E1610" : "#FAF7F4";
+  const activeBg = isDark ? "rgba(255,255,255,0.10)" : "rgba(201,144,42,0.12)";
+  const activeColor = isDark ? "#FFFFFF" : "#2C221A";
+  const inactiveColor = isDark ? "rgba(255,255,255,0.50)" : "rgba(44,34,26,0.45)";
+  const activeBorder = isDark ? "rgba(212,196,176,0.6)" : "#C9902A";
+  const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(201,144,42,0.07)";
+  const logoutColor = isDark ? "rgba(255,255,255,0.35)" : "rgba(44,34,26,0.35)";
+  const borderRight = isDark ? "none" : "1px solid #E2D8CE";
+  const boxShadow = isDark ? "4px 0 24px rgba(0,0,0,0.35)" : "6px 0 24px rgba(140,123,107,0.10)";
+
+  const logo = isDark ? logoDark : logoLight;
+  const card = isDark ? cardDark : cardLight;
 
   const navItems = [
-    { icon: <LayoutDashboard size={18} strokeWidth={1.5} />, label: "Dashboard",       path: "/designer/dashboard" },
-    { icon: <ClipboardList size={18} strokeWidth={1.5} />, label: "Manage Requests",   path: "/designer/manage" },
-    { icon: <Tag             size={18} strokeWidth={1.5} />, label: "Offers",          path: "/designer/offers"    },
-    { icon: <User            size={18} strokeWidth={1.5} />, label: "My Profile",      path: "/designer/profile"   },
-    { icon: <Settings        size={18} strokeWidth={1.5} />, label: "Settings",        path: "/designer/settings"  },
+    { icon: <LayoutDashboard size={18} strokeWidth={1.5} />, label: "Dashboard", path: "/designer/dashboard" },
+    { icon: <ClipboardList size={18} strokeWidth={1.5} />, label: "Manage Requests", path: "/designer/manage" },
+    { icon: <Tag size={18} strokeWidth={1.5} />, label: "Offers", path: "/designer/offers" },
+    { icon: <User size={18} strokeWidth={1.5} />, label: "My Profile", path: "/designer/profile" },
+    { icon: <Settings size={18} strokeWidth={1.5} />, label: "Settings", path: "/designer/settings" },
   ];
 
   const getIsActive = (itemPath) => {
     const current = location.pathname;
-
-    // صفحة تفاصيل الطلب — لا تهايلت أي زر
     if (/^\/designer\/requests\/\d+/.test(current)) return false;
-
-    // مطابقة تامة للـ path
     if (current === itemPath) return true;
-
-    // Manage Requests — يهايلت فقط على /designer/requests بالضبط
     if (itemPath === "/designer/requests" && current === "/designer/requests") return true;
-
     return false;
   };
 
-  return (
-    <aside style={{
-      width: 220, flexShrink: 0,
+  const goTo = (path) => {
+    navigate(path);
+    setOpen(false);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+    setOpen(false);
+  };
+
+  const sidebarContent = (
+    <aside className="designer-sidebar" style={{
+      width: 220,
+      flexShrink: 0,
       background: sidebarBg,
-      borderRight, boxShadow,
-      display: "flex", flexDirection: "column",
+      borderRight,
+      boxShadow,
+      display: "flex",
+      flexDirection: "column",
       justifyContent: "space-between",
       height: "100vh",
       padding: "36px 0",
     }}>
-      {/* Top: Logo + Nav */}
       <div>
         <div style={{ padding: "0 20px 48px", display: "flex", justifyContent: "center" }}>
           <img src={logo} alt="Swagne" style={{ width: 88, height: 88, objectFit: "contain" }} />
         </div>
+
         <nav style={{ display: "flex", flexDirection: "column", gap: 4, padding: "0 12px" }}>
           {navItems.map((item) => {
             const isActive = getIsActive(item.path);
             return (
               <button
                 key={item.path}
-                onClick={() => navigate(item.path)}
-                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = hoverBg; }}
-                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+                onClick={() => goTo(item.path)}
+                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
                 style={{
-                  width: "100%", display: "flex", alignItems: "center", gap: 10,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
                   padding: "13px 16px",
                   borderRadius: 10,
                   background: isActive ? activeBg : "transparent",
@@ -80,9 +103,11 @@ export default function DesignerSidebar({ variant = "light" }) {
                   borderLeft: isActive ? `2px solid ${activeBorder}` : "2px solid transparent",
                   cursor: "pointer",
                   color: isActive ? activeColor : inactiveColor,
-                  fontSize: 13, fontFamily: "'Jost', sans-serif",
+                  fontSize: 13,
+                  fontFamily: "'Jost', sans-serif",
                   fontWeight: isActive ? 500 : 400,
-                  letterSpacing: "0.02em", textAlign: "left",
+                  letterSpacing: "0.02em",
+                  textAlign: "left",
                   transition: "background 0.15s",
                 }}
               >
@@ -94,21 +119,29 @@ export default function DesignerSidebar({ variant = "light" }) {
         </nav>
       </div>
 
-      {/* Bottom: Card + Logout */}
       <div>
         <div style={{ padding: "0 14px 16px" }}>
           <img src={card} alt="New tools coming" style={{ width: "100%", borderRadius: 12 }} />
         </div>
+
         <button
-          onClick={() => { localStorage.removeItem("token"); localStorage.removeItem("user"); navigate("/"); }}
-          onMouseEnter={e => e.currentTarget.style.background = hoverBg}
-          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          onClick={logout}
+          onMouseEnter={(e) => (e.currentTarget.style.background = hoverBg)}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           style={{
-            width: "100%", display: "flex", alignItems: "center", gap: 10,
-            padding: "11px 20px", background: "transparent", border: "none",
-            cursor: "pointer", color: logoutColor,
-            fontSize: 13, fontFamily: "'Jost', sans-serif",
-            textAlign: "left", transition: "background 0.15s",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "11px 20px",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            color: logoutColor,
+            fontSize: 13,
+            fontFamily: "'Jost', sans-serif",
+            textAlign: "left",
+            transition: "background 0.15s",
           }}
         >
           <LogOut size={18} strokeWidth={1.5} />
@@ -116,5 +149,120 @@ export default function DesignerSidebar({ variant = "light" }) {
         </button>
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      <style>{`
+        .designer-mobile-menu-btn {
+          display: none;
+        }
+
+        .designer-sidebar-desktop {
+          display: block;
+        }
+
+        .designer-drawer-overlay {
+          display: none;
+        }
+
+        @media (max-width: 1024px) {
+          .designer-sidebar-desktop {
+            display: none;
+          }
+
+          .designer-mobile-menu-btn {
+            display: flex;
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            z-index: 2000;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 1px solid #E2D8CE;
+            background: #FFFFFF;
+            color: #2C221A;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 28px rgba(44,34,26,0.12);
+            cursor: pointer;
+          }
+
+          .designer-drawer-overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.38);
+            z-index: 1998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+          }
+
+          .designer-drawer-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          .designer-sidebar-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1999;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+          }
+
+          .designer-sidebar-drawer.open {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+
+      <button
+        className="designer-mobile-menu-btn"
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+      >
+        <Menu size={22} />
+      </button>
+
+      <div className="designer-sidebar-desktop">
+        {sidebarContent}
+      </div>
+
+      <div
+        className={`designer-drawer-overlay ${open ? "open" : ""}`}
+        onClick={() => setOpen(false)}
+      />
+
+      <div className={`designer-sidebar-drawer ${open ? "open" : ""}`}>
+        <button
+          onClick={() => setOpen(false)}
+          aria-label="Close menu"
+          style={{
+            position: "absolute",
+            top: 14,
+            right: 14,
+            zIndex: 2,
+            width: 34,
+            height: 34,
+            borderRadius: 10,
+            border: "none",
+            background: isDark ? "rgba(255,255,255,0.08)" : "#FFFFFF",
+            color: isDark ? "#FFFFFF" : "#2C221A",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+        >
+          <X size={18} />
+        </button>
+
+        {sidebarContent}
+      </div>
+    </>
   );
 }
