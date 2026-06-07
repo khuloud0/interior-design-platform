@@ -26,7 +26,7 @@ export default function DesignerSidebar({ variant = "light" }) {
   const navItems = [
     { icon: <LayoutDashboard size={18} strokeWidth={1.5} />, label: "Dashboard",       path: "/designer/dashboard" },
     { icon: <ClipboardList   size={18} strokeWidth={1.5} />, label: "Manage Requests", path: "/designer/manage"    },
-    { icon: <User            size={18} strokeWidth={1.5} />, label: "My Profile",      path: "/designer/profile"   },
+    { icon: <User            size={18} strokeWidth={1.5} />, label: "My Profile",      path: "/designer/MyProfile" },
     { icon: <Settings        size={18} strokeWidth={1.5} />, label: "Settings",        path: "/designer/settings"  },
   ];
 
