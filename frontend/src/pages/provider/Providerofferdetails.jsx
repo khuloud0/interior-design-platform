@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import ProviderSidebar from "../../components/ProviderSidebar";
+import ProviderSidebar from "../../components/Providersidebar";
 import { ArrowLeft, Briefcase, DollarSign, Clock, FileText, CheckCircle, XCircle, Send } from "lucide-react";
 
 const C = {
