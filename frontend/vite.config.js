@@ -6,10 +6,10 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      "/auth": "http://127.0.0.1:5000",
-      "/design-requests": "http://127.0.0.1:5000",
-      "/designers": "http://127.0.0.1:5000",
-      "/contractor-offers": "http://127.0.0.1:5000",
+      "/auth": "https://interior-design-platform-production.up.railway.app",
+      "/design-requests": "https://interior-design-platform-production.up.railway.app",
+      "/designers": "https://interior-design-platform-production.up.railway.app",
+      "/contractor-offers": "https://interior-design-platform-production.up.railway.app",
     },
   },
 });
