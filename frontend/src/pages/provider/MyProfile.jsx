@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Briefcase, Mail, MapPin, Phone, Wrench } from 'lucide-react';
 import api from '../../services/api';
-import ProviderSidebar from '../../components/ProviderSidebar';
+import ProviderSidebar from "../../components/Providersidebar";
 
 const PHOTO_PLACEHOLDER =
   'data:image/svg+xml;utf8,' +
