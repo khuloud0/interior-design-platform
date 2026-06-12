@@ -44,7 +44,7 @@ export default function Login() {
     if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return; }
     setLoading(true); setMessage("");
     try {
-      const res = await fetch("https://interior-design-platform-production.up.railway.app", {
+      const res = await fetch("https://interior-design-platform-production.up.railway.app/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
