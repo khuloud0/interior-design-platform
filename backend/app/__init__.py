@@ -11,7 +11,17 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object("app.config.DevelopmentConfig")
 
-    CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
+    # 1️⃣ تفعيل الـ CORS الأساسي
+    CORS(app, resources={r"/*": {"origins": "*"}})
+    
+    # 2️⃣ 🌟 الحل السحري: حقن الـ Headers يدوياً لكل الطلبات (بما فيها OPTIONS الأسبوعية)
+    @app.after_request
+    def after_request(response):
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+        response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
+        return response
+
     db.init_app(app)
     jwt.init_app(app)
 
