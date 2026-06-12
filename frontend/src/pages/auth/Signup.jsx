@@ -155,7 +155,7 @@ export default function Signup() {
     setIsError(false);
 
     try {
-      const res = await axios.post("http://127.0.0.1:5000/auth/register", {
+      const res = await axios.post("https://interior-design-platform-production.up.railway.app", {
         ...formData,
         phone: "+966" + formData.phone,
         role: selectedRole,
