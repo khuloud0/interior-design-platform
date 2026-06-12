@@ -1,0 +1,8 @@
+export { Hero } from './Hero'
+export { Overview } from './Overview'
+export { Intro } from './Intro'
+export { Reasons } from './Reasons'
+export { Showcase } from './Showcase'
+export { Articles } from './Articles'
+export { Faq } from './Faq'
+export { CtaBanner } from './CtaBanner'
