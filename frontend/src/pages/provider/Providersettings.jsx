@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ProviderSidebar from "../../components/ProviderSidebar";
+import ProviderSidebar from "../../components/Providersidebar";
 import { User, Lock, Bell, CreditCard, Check, Eye, EyeOff, ChevronRight } from "lucide-react";
 
 const C = {
