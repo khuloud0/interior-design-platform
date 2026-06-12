@@ -11,34 +11,32 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object("app.config.DevelopmentConfig")
 
-    # 1️⃣ تفعيل الـ CORS الأساسي الشامل
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    # 1️⃣ تفعيل الـ CORS الشامل مع السماح بـ العناوين والرؤوس الرسمية للموقع
+    CORS(app, resources={r"/*": {
+        "origins": ["https://adventurous-inspiration-production-938b.up.railway.app", "http://localhost:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }})
     
-    # 2️⃣ 🌟 السحر الحقيقي: اعتراض طلبات الـ OPTIONS والإجابة عليها فوراً بـ 200 لمنع الانهيار
+    # 2️⃣ اعتراض طلبات الـ OPTIONS الـ Preflight لضمان عبورها بأمان
     @app.before_request
     def handle_options_requests():
         if request.method == "OPTIONS":
             response = make_response()
-            response.headers.add("Access-Control-Allow-Origin", "*")
+            response.headers.add("Access-Control-Allow-Origin", "https://adventurous-inspiration-production-938b.up.railway.app")
             response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
             response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
+            response.headers.add("Access-Control-Allow-Credentials", "true")
             return response
-
-    # 3️⃣ حقن الـ Headers لباقي الطلبات العادية
-    @app.after_request
-    def after_request(response):
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response
 
     db.init_app(app)
     jwt.init_app(app)
 
-    # ✅ يجعل الـ identity يُقبل كـ dict
     @jwt.user_identity_loader
     def user_identity_lookup(identity):
         return identity
 
-    # ✅ الترتيب مهم: DesignRequest قبل DesignPlan و ContractorOffer
     from app.models import User, ProviderProfile, DesignerProfile
     from app.models.design_request import DesignRequest
     from app.models.design_plan import DesignPlan, PlanStage
