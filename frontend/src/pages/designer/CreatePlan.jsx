@@ -150,7 +150,7 @@ export default function CreatePlan() {
       setLoadingReq(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}`, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         if (res.ok) setRequest(data.request ?? data);
       } catch {}
@@ -164,7 +164,7 @@ export default function CreatePlan() {
       setLoadingPlan(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/plan`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/plan`, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         if (res.ok && data.plan) {
           const p = data.plan;
@@ -185,7 +185,7 @@ export default function CreatePlan() {
     setLoadingPublished(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/contractor-offers/published`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/contractor-offers/published`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       if (res.ok) setPublishedOffers(data.offers ?? []);
     } catch {}
@@ -197,7 +197,7 @@ export default function CreatePlan() {
     setLoadingOffers(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/contractor-offers/responses`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/contractor-offers/responses`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       if (res.ok) setIncomingOffers(data.offers ?? []);
     } catch {}
@@ -246,7 +246,7 @@ export default function CreatePlan() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("request_id", id);
-      const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/plan/attachments`, {
+      const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/plan/attachments`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -319,7 +319,7 @@ export default function CreatePlan() {
     setPublishingOffer(i);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/contractor-offers`, {
+      const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/contractor-offers`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...offer, budget: Number(offer.budget), request_id: Number(id), designer_id: designer?.id }),
@@ -357,7 +357,7 @@ export default function CreatePlan() {
     setSendError(""); setSendingToClient(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/send-to-client`, {
+      const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/send-to-client`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ designer_id: designer?.id, selected_offers: selected.map(([offer_id, v]) => ({ offer_id: Number(offer_id), recommendation: v.recommendation })) }),
