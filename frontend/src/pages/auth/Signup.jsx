@@ -114,7 +114,7 @@ export default function Signup() {
     setIsError(false);
     try {
       const res = await axios.post(
-        "https://interior-design-platform-production.up.railway.app/auth/signup",
+        "https://interior-design-platform-production.up.railway.app/auth/register",
         {
           ...formData,
           phone: "+966" + formData.phone,
