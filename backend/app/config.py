@@ -9,11 +9,13 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     DB_USER = os.getenv("DB_USER")
+    DB_PASSWORD = os.getenv("DB_PASSWORD")
     DB_NAME = os.getenv("DB_NAME", "interior_design")
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = os.getenv("DB_PORT", "5432")
+    DB_AUTH = f"{DB_USER}:{DB_PASSWORD}" if DB_PASSWORD else DB_USER
     SQLALCHEMY_DATABASE_URI = (
-        f"postgresql://{DB_USER}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        f"postgresql://{DB_AUTH}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
