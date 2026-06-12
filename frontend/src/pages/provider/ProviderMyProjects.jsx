@@ -170,10 +170,10 @@ export default function ProviderMyProjects() {
         const token = localStorage.getItem("token");
         // ✅ نجلب العروض اللي وافق عليها المقاول (submitted) والمشاريع الفعلية (active)
         const [resSubmitted, resActive] = await Promise.all([
-          fetch(`http://127.0.0.1:5000/contractor-offers?provider_id=${provider?.id}&status=submitted`, {
+          fetch(`https://interior-design-platform-production.up.railway.app/contractor-offers?provider_id=${provider?.id}&status=submitted`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`http://127.0.0.1:5000/contractor-offers?provider_id=${provider?.id}&status=active`, {
+          fetch(`https://interior-design-platform-production.up.railway.app/contractor-offers?provider_id=${provider?.id}&status=active`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

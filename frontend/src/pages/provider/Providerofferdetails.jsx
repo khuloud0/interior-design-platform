@@ -73,7 +73,7 @@ export default function ProviderOfferDetails() {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}`, {
+        const res   = await fetch(`https://interior-design-platform-production.up.railway.app/contractor-offers/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -90,7 +90,7 @@ export default function ProviderOfferDetails() {
     setActing(true); setError("");
     try {
       const token = localStorage.getItem("token");
-      const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/accept`, {
+      const res   = await fetch(`https://interior-design-platform-production.up.railway.app/contractor-offers/${id}/accept`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ provider_id: provider?.id }),
@@ -115,7 +115,7 @@ export default function ProviderOfferDetails() {
     setSubmittingOffer(true);
     try {
       const token = localStorage.getItem("token");
-      const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/respond`, {
+      const res   = await fetch(`https://interior-design-platform-production.up.railway.app/contractor-offers/${id}/respond`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ ...myOffer, budget: Number(myOffer.budget), provider_id: provider?.id }),
@@ -144,7 +144,7 @@ export default function ProviderOfferDetails() {
     setActing(true); setError("");
     try {
       const token = localStorage.getItem("token");
-      const res   = await fetch(`http://127.0.0.1:5000/contractor-offers/${id}/decline`, {
+      const res   = await fetch(`https://interior-design-platform-production.up.railway.app/contractor-offers/${id}/decline`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ provider_id: provider?.id }),

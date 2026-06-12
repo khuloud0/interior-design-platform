@@ -31,7 +31,7 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://127.0.0.1:5000/design-requests", {
+        const res = await fetch("https://interior-design-platform-production.up.railway.app/design-requests", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

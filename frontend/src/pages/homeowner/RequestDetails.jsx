@@ -389,7 +389,7 @@ export function RequestDetailsPage() {
 
   const fetchData = () => {
     const token = localStorage.getItem("token");
-    fetch(`http://127.0.0.1:5000/design-requests/${id}`, {
+    fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.json())
@@ -412,13 +412,13 @@ export function RequestDetailsPage() {
     try {
       const token = localStorage.getItem("token");
       // نختار العرض
-      await fetch(`http://127.0.0.1:5000/design-requests/${id}/select-offer`, {
+      await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/select-offer`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ offer_id: payOffer.id }),
       });
       // نحدث الـ status لـ completed
-      await fetch(`http://127.0.0.1:5000/design-requests/${id}`, {
+      await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ status: "completed" }),

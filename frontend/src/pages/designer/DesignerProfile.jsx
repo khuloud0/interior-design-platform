@@ -41,7 +41,7 @@ export default function DesignerProfile() {
 
   React.useEffect(() => {
     setLoading(true); setError("");
-    fetch(`http://127.0.0.1:5000/designers/${slug}`)
+    fetch(`https://interior-design-platform-production.up.railway.app/designers/${slug}`)
       .then(r => r.json().then(data => ({ ok: r.ok, data })))
       .then(({ ok, data }) => { if (!ok) { setError(data.error || "Designer not found"); return; } setDesigner(data); })
       .catch(() => setError("Failed to load designer profile."))

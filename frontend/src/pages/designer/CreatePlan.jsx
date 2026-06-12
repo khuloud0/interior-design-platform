@@ -294,7 +294,7 @@ export default function CreatePlan() {
     try {
       const token = localStorage.getItem("token");
       const uploadedPaths = attachments.filter(a => a.uploaded && a.path).map(a => ({ path: a.path, name: a.name, type: a.type, size: a.size }));
-      const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/plan`, {
+      const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/plan`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...plan, estimated_budget: plan.estimated_budget ? Number(plan.estimated_budget) : null, attachments: uploadedPaths, designer_id: designer?.id }),

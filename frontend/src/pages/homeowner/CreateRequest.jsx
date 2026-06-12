@@ -141,7 +141,7 @@ export default function CreateRequest() {
     try {
       const user  = JSON.parse(localStorage.getItem("user"));
       const token = localStorage.getItem("token");
-      const url   = editMode ? `http://127.0.0.1:5000/design-requests/${existing.id}` : "http://127.0.0.1:5000/design-requests";
+      const url   = editMode ? `https://interior-design-platform-production.up.railway.app/design-requests/${existing.id}` : "https://interior-design-platform-production.up.railway.app/design-requests";
       const res   = await fetch(url, {
         method: editMode ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

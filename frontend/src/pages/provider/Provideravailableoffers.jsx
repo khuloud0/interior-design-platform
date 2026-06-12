@@ -126,7 +126,7 @@ export default function ProviderAvailableOffers() {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://127.0.0.1:5000/contractor-offers", {
+        const res = await fetch("https://interior-design-platform-production.up.railway.app/contractor-offers", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

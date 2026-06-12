@@ -20,7 +20,7 @@ export default function VerifyEmail() {
     setMessage("");
 
     try {
-      await axios.post("http://127.0.0.1:5000/auth/verify-email", {
+      await axios.post("https://interior-design-platform-production.up.railway.app/auth/verify-email", {
         email,
         verified: true,
       });

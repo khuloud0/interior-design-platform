@@ -232,7 +232,7 @@ export default function ExploreDesigners() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://127.0.0.1:5000/designers")
+    fetch("https://interior-design-platform-production.up.railway.app/designers")
       .then(r => r.json())
       .then(d => setDesigners(d.designers ?? []))
       .catch(() => setDesigners(MOCK_DESIGNERS))

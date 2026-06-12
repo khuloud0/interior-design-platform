@@ -180,7 +180,7 @@ function AccountTab() {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://127.0.0.1:5000/auth/me", {
+      const res = await fetch("https://interior-design-platform-production.up.railway.app/auth/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(form),
@@ -238,7 +238,7 @@ function PasswordTab() {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://127.0.0.1:5000/auth/change-password", {
+      const res = await fetch("https://interior-design-platform-production.up.railway.app/auth/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ current_password: form.current, new_password: form.newPass }),
@@ -298,7 +298,7 @@ function NotificationsTab() {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://127.0.0.1:5000/provider/notifications/settings", {
+      const res = await fetch("https://interior-design-platform-production.up.railway.app/provider/notifications/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(notifs),
@@ -347,7 +347,7 @@ function BillingTab() {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://127.0.0.1:5000/provider/billing", {
+      const res = await fetch("https://interior-design-platform-production.up.railway.app/provider/billing", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ iban }),

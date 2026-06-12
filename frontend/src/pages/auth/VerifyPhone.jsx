@@ -102,7 +102,7 @@ if (!pendingSignup) {
   return;
 }
 
-const registerResponse = await fetch("http://127.0.0.1:5000/auth/register", {
+const registerResponse = await fetch("https://interior-design-platform-production.up.railway.app/auth/register", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -119,7 +119,7 @@ if (!registerResponse.ok) {
   return;
 }
 
-await fetch("http://127.0.0.1:5000/auth/verify-phone", {
+await fetch("https://interior-design-platform-production.up.railway.app/auth/verify-phone", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -128,7 +128,7 @@ await fetch("http://127.0.0.1:5000/auth/verify-phone", {
   }),
 });
 
-const loginResponse = await fetch("http://127.0.0.1:5000/auth/login", {
+const loginResponse = await fetch("https://interior-design-platform-production.up.railway.app/auth/login", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({

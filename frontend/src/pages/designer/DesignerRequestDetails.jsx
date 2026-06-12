@@ -51,7 +51,7 @@ const load = async () => {
 setLoading(true);
 try {
 const token = localStorage.getItem("token");
-const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}`, {
+const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}`, {
 headers: { Authorization: `Bearer ${token}` },
         });
 const data = await res.json();
@@ -66,7 +66,7 @@ const handleAction = async (action) => {
 setActing(true); setError("");
 try {
 const token = localStorage.getItem("token");
-const res = await fetch(`http://127.0.0.1:5000/design-requests/${id}/${action}`, {
+const res = await fetch(`https://interior-design-platform-production.up.railway.app/design-requests/${id}/${action}`, {
 method: "POST",
 headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
 body: JSON.stringify({ designer_id: designer?.id }),

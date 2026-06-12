@@ -165,8 +165,8 @@ export default function CreateRequestModal({
       const user = JSON.parse(localStorage.getItem("user"));
       const homeowner_id = user?.id;
       const url = mode === "edit"
-        ? `http://127.0.0.1:5000/design-requests/${requestId}`
-        : "http://127.0.0.1:5000/design-requests";
+        ? `https://interior-design-platform-production.up.railway.app/design-requests/${requestId}`
+        : "https://interior-design-platform-production.up.railway.app/design-requests";
       const res = await fetch(url, {
         method: mode === "edit" ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
