@@ -20,7 +20,6 @@ export default function Signup() {
   };
 
   const inputWrap = { position: "relative", display: "flex", alignItems: "center" };
-
   const inputStyle = (hasError) => ({
     width: "100%", background: c.inputBg,
     border: `1px solid ${hasError ? c.error : c.border}`,
@@ -28,14 +27,12 @@ export default function Signup() {
     fontSize: "12px", fontFamily: "'Jost', sans-serif",
     fontWeight: 300, color: c.dark, outline: "none", boxSizing: "border-box",
   });
-
   const iconStyle = {
     position: "absolute", right: "11px", color: c.muted,
     display: "flex", alignItems: "center", pointerEvents: "none",
   };
 
   const roles = ["client", "designer", "provider"];
-
   const emailRegex    = /^[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo|microsoft)\.com$/;
   const phoneRegex    = /^5[0-9]{8}$/;
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
@@ -44,80 +41,45 @@ export default function Signup() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
     if (name === "name") {
-      if (!value) {
-        setErrors({ ...errors, name: "Name is required" });
-      } else if (!isValidName(value)) {
-        setErrors({ ...errors, name: "Name must contain letters only, no numbers or symbols" });
-      } else {
-        setErrors({ ...errors, name: "" });
-      }
+      if (!value) setErrors({ ...errors, name: "Name is required" });
+      else if (!isValidName(value)) setErrors({ ...errors, name: "Name must contain letters only, no numbers or symbols" });
+      else setErrors({ ...errors, name: "" });
       return;
     }
-
     if (name === "email") {
-      if (!value) {
-        setErrors({ ...errors, email: "Email is required" });
-      } else if (!emailRegex.test(value)) {
-        setErrors({ ...errors, email: "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com" });
-      } else {
-        setErrors({ ...errors, email: "" });
-      }
+      if (!value) setErrors({ ...errors, email: "Email is required" });
+      else if (!emailRegex.test(value)) setErrors({ ...errors, email: "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com" });
+      else setErrors({ ...errors, email: "" });
       return;
     }
-
     if (name === "phone") {
-      if (!value) {
-        setErrors({ ...errors, phone: "Phone is required" });
-      } else if (!/^[0-9]+$/.test(value)) {
-        setErrors({ ...errors, phone: "Phone must contain English numbers only" });
-      } else if (!phoneRegex.test(value)) {
-        setErrors({ ...errors, phone: "Phone must start with 5 and be 9 digits (e.g. 501234567)" });
-      } else {
-        setErrors({ ...errors, phone: "" });
-      }
+      if (!value) setErrors({ ...errors, phone: "Phone is required" });
+      else if (!/^[0-9]+$/.test(value)) setErrors({ ...errors, phone: "Phone must contain English numbers only" });
+      else if (!phoneRegex.test(value)) setErrors({ ...errors, phone: "Phone must start with 5 and be 9 digits (e.g. 501234567)" });
+      else setErrors({ ...errors, phone: "" });
       return;
     }
-
     if (name === "password") {
-      if (!value) {
-        setErrors({ ...errors, password: "Password is required" });
-      } else if (!passwordRegex.test(value)) {
-        setErrors({ ...errors, password: "Password must be at least 8 characters and include uppercase, lowercase, number & special character" });
-      } else {
-        setErrors({ ...errors, password: "" });
-      }
+      if (!value) setErrors({ ...errors, password: "Password is required" });
+      else if (!passwordRegex.test(value)) setErrors({ ...errors, password: "Password must be at least 8 characters and include uppercase, lowercase, number & special character" });
+      else setErrors({ ...errors, password: "" });
       return;
     }
-
     setErrors({ ...errors, [name]: "" });
   };
 
   const validate = () => {
     const e = {};
-    if (!formData.name) {
-      e.name = "Name is required";
-    } else if (!isValidName(formData.name)) {
-      e.name = "Name must contain letters only, no numbers or symbols";
-    }
-    if (!formData.email) {
-      e.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      e.email = "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com";
-    }
-    if (!formData.phone) {
-      e.phone = "Phone is required";
-    } else if (!/^[0-9]+$/.test(formData.phone)) {
-      e.phone = "Phone must contain English numbers only";
-    } else if (!phoneRegex.test(formData.phone)) {
-      e.phone = "Phone must start with 5 and be 9 digits (e.g. 501234567)";
-    }
-    if (!formData.password) {
-      e.password = "Password is required";
-    } else if (!passwordRegex.test(formData.password)) {
-      e.password = "Must include uppercase, lowercase, number & special character";
-    }
+    if (!formData.name) e.name = "Name is required";
+    else if (!isValidName(formData.name)) e.name = "Name must contain letters only, no numbers or symbols";
+    if (!formData.email) e.email = "Email is required";
+    else if (!emailRegex.test(formData.email)) e.email = "Email must be English only and use gmail.com, hotmail.com, yahoo.com, or microsoft.com";
+    if (!formData.phone) e.phone = "Phone is required";
+    else if (!/^[0-9]+$/.test(formData.phone)) e.phone = "Phone must contain English numbers only";
+    else if (!phoneRegex.test(formData.phone)) e.phone = "Phone must start with 5 and be 9 digits (e.g. 501234567)";
+    if (!formData.password) e.password = "Password is required";
+    else if (!passwordRegex.test(formData.password)) e.password = "Must include uppercase, lowercase, number & special character";
     return e;
   };
 
@@ -138,54 +100,46 @@ export default function Signup() {
     e.preventDefault();
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-
     if (!selectedRole) {
       setErrors({ role: "Please select a role" });
       return;
     }
-
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-
     setLoading(true);
     setMessage("");
     setIsError(false);
-
     try {
-      const res = await axios.post("https://interior-design-platform-production.up.railway.app", {
-        ...formData,
-        phone: "+966" + formData.phone,
-        role: selectedRole,
-      });
-
+      const res = await axios.post(
+        "https://interior-design-platform-production.up.railway.app/auth/signup",
+        {
+          ...formData,
+          phone: "+966" + formData.phone,
+          role: selectedRole,
+        }
+      );
       const user  = res.data?.user;
       const token = res.data?.token;
-
       if (!user) {
         setMessage("Signup failed. Please try again.");
         setIsError(true);
         return;
       }
-
       const userWithRole = { ...user, role: selectedRole };
       localStorage.setItem("user", JSON.stringify(userWithRole));
       if (token) localStorage.setItem("token", token);
-
       setMessage("Account created successfully.");
       setIsError(false);
-
       setTimeout(() => {
-        // ✅ كل دور يروح لصفحته الصحيحة
         window.location.href =
           userWithRole.role === "designer" ? "/designer/requests"
           : userWithRole.role === "client"   ? "/dashboard"
           : userWithRole.role === "provider" ? "/provider/offers"
           : "/";
       }, 1500);
-
     } catch (err) {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
@@ -221,7 +175,6 @@ export default function Signup() {
         display: "grid", gridTemplateColumns: "1fr 1fr",
         fontFamily: "'Jost', sans-serif",
       }}>
-
         {/* LEFT — Image */}
         <div style={{ overflow: "hidden" }}>
           <img src={signupImg} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -234,7 +187,6 @@ export default function Signup() {
           borderLeft: `1px solid ${c.border}`, overflowY: "auto",
         }}>
           <div>
-
             {/* Logo + Sign in */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "40px" }}>
               <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: "9px", textDecoration: "none" }}>
@@ -253,7 +205,6 @@ export default function Signup() {
             }}>Create your account</h1>
 
             <form onSubmit={handleSubmit}>
-
               {/* Full Name */}
               <div style={{ marginBottom: "14px" }}>
                 <label style={{ display: "block", fontSize: "9px", fontWeight: 500, color: c.stone, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "5px" }}>
