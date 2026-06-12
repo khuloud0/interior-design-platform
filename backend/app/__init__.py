@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -11,15 +11,23 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object("app.config.DevelopmentConfig")
 
-    # 1️⃣ تفعيل الـ CORS الأساسي
+    # 1️⃣ تفعيل الـ CORS الأساسي الشامل
     CORS(app, resources={r"/*": {"origins": "*"}})
     
-    # 2️⃣ 🌟 الحل السحري: حقن الـ Headers يدوياً لكل الطلبات (بما فيها OPTIONS الأسبوعية)
+    # 2️⃣ 🌟 السحر الحقيقي: اعتراض طلبات الـ OPTIONS والإجابة عليها فوراً بـ 200 لمنع الانهيار
+    @app.before_request
+    def handle_options_requests():
+        if request.method == "OPTIONS":
+            response = make_response()
+            response.headers.add("Access-Control-Allow-Origin", "*")
+            response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+            response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
+            return response
+
+    # 3️⃣ حقن الـ Headers لباقي الطلبات العادية
     @app.after_request
     def after_request(response):
         response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-        response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
         return response
 
     db.init_app(app)
